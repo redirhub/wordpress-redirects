@@ -84,13 +84,13 @@ final class Status {
 		switch ( $kind ) {
 			case 'network':
 				/* translators: %s: the error message of the HTTP request. */
-				return sprintf( __( 'RedirHub could not be reached from this server: %s', 'redirhub-redirects' ), $detail );
+				return sprintf( __( 'Couldn’t reach RedirHub from this server (%s). Your redirects keep working with the last good copy.', 'redirhub-redirects' ), $detail );
 			case 'http':
 				if ( '404' === $detail || '403' === $detail ) {
 					return __( 'This rules address does not exist (any more). Copy it again from the RedirHub dashboard: it changes when the integration key is rotated or the domain is removed.', 'redirhub-redirects' );
 				}
 				/* translators: %s: an HTTP status code. */
-				return sprintf( __( 'RedirHub answered with status %s. The plugin keeps using the last good copy and tries again shortly.', 'redirhub-redirects' ), $detail );
+				return sprintf( __( 'RedirHub answered with an error (%s). Your redirects keep working with the last good copy; the plugin tries again shortly.', 'redirhub-redirects' ), $detail );
 			case 'size':
 				return __( 'The rules file is larger than 32 MB.', 'redirhub-redirects' );
 			case 'format':

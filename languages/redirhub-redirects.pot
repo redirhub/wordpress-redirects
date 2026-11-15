@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-15T00:22:50+00:00\n"
+"POT-Creation-Date: 2026-11-15T03:54:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: redirhub-redirects\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #: redirhub-redirects.php
 #: includes/Admin/Page.php:49
-#: includes/Admin/Page.php:300
+#: includes/Admin/Page.php:302
 #: includes/Admin/SiteHealth.php:86
 msgid "RedirHub Redirects"
 msgstr ""
@@ -29,7 +29,7 @@ msgstr ""
 
 #. Description of the plugin
 #: redirhub-redirects.php
-msgid "Serves the redirects you manage in RedirHub from this WordPress site, without moving your DNS: short links, migrations and catch-alls, with click analytics."
+msgid "Send every old, moved or mistyped link to the right page: keep your search rankings, run short links on your own domain and see every click. No server or DNS changes."
 msgstr ""
 
 #. Author of the plugin
@@ -44,21 +44,20 @@ msgid "https://www.redirhub.com"
 msgstr ""
 
 #: includes/Admin/Notices.php:39
-msgid "RedirHub Redirects is active. Connect it to your RedirHub domain to start serving redirects."
+msgid "Almost there: connect your domain, and every old link starts landing on the right page."
 msgstr ""
 
 #: includes/Admin/Notices.php:41
-#: includes/Admin/Page.php:367
+#: includes/Admin/Page.php:369
 msgid "Connect"
 msgstr ""
 
 #: includes/Admin/Notices.php:50
-msgid "RedirHub Redirects cannot download the rules."
+msgid "Your redirects can’t be updated."
 msgstr ""
 
 #: includes/Admin/Notices.php:53
-#: includes/Admin/SiteHealth.php:56
-msgid "Open RedirHub Redirects"
+msgid "See what to do"
 msgstr ""
 
 #: includes/Admin/Page.php:73
@@ -70,487 +69,494 @@ msgid "Copied"
 msgstr ""
 
 #: includes/Admin/Page.php:86
-#: includes/Admin/Page.php:725
+#: includes/Admin/Page.php:733
 msgid "Settings"
 msgstr ""
 
-#: includes/Admin/Page.php:110
+#: includes/Admin/Page.php:112
 msgid "That integration key does not look right: it is a run of letters and digits, shown next to the setup in the RedirHub dashboard."
 msgstr ""
 
-#: includes/Admin/Page.php:136
-#: includes/Admin/Page.php:169
+#: includes/Admin/Page.php:138
+#: includes/Admin/Page.php:171
 msgid "Another download is running. Try again in a moment."
 msgstr ""
 
-#: includes/Admin/Page.php:137
+#: includes/Admin/Page.php:139
 msgid "Not connected."
 msgstr ""
 
 #. translators: 1: number of rules, 2: list of hostnames.
-#: includes/Admin/Page.php:145
+#: includes/Admin/Page.php:147
 #, php-format
-msgid "Connected. %1$d rule for %2$s is in use."
-msgid_plural "Connected. %1$d rules for %2$s are in use."
+msgid "Connected. %1$d redirect for %2$s is live."
+msgid_plural "Connected. %1$d redirects for %2$s are live."
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: the site's hostname, 2: hostnames.
-#: includes/Admin/Page.php:148
+#: includes/Admin/Page.php:150
 #, php-format
-msgid "This site answers as %1$s, but the rules file is for %2$s. Only requests for those hostnames are redirected."
+msgid "This site’s address is %1$s, but these redirects are for %2$s: only visits to those addresses are redirected."
 msgstr ""
 
-#: includes/Admin/Page.php:152
-msgid "Redirects work without the integration key; add it to see their clicks in RedirHub’s analytics."
+#: includes/Admin/Page.php:154
+msgid "Your redirects work now. Add the integration key to also see how often each one is clicked."
 msgstr ""
 
-#: includes/Admin/Page.php:163
-msgid "New rules downloaded and in use."
+#: includes/Admin/Page.php:165
+msgid "Your latest redirects are live."
 msgstr ""
 
-#: includes/Admin/Page.php:163
-#: includes/Admin/Page.php:166
-msgid "The rules are up to date."
+#: includes/Admin/Page.php:165
+#: includes/Admin/Page.php:168
+msgid "Your redirects are up to date."
 msgstr ""
 
-#: includes/Admin/Page.php:192
+#: includes/Admin/Page.php:194
 msgid "Settings saved."
 msgstr ""
 
-#: includes/Admin/Page.php:210
+#: includes/Admin/Page.php:212
 msgid "The rules address is set in wp-config.php: remove REDIRHUB_RULES_URL there to disconnect for good."
 msgstr ""
 
-#: includes/Admin/Page.php:211
-msgid "Disconnected. This site no longer serves RedirHub redirects."
+#: includes/Admin/Page.php:213
+msgid "Disconnected. This site no longer redirects anything; your pages work as before."
 msgstr ""
 
-#: includes/Admin/Page.php:228
+#: includes/Admin/Page.php:230
 msgid "Sorry, you are not allowed to manage RedirHub."
 msgstr ""
 
-#: includes/Admin/Page.php:275
+#: includes/Admin/Page.php:277
 msgid "Paste the rules address from the RedirHub dashboard."
 msgstr ""
 
-#: includes/Admin/Page.php:278
+#: includes/Admin/Page.php:280
 msgid "That is not a web address. Paste the rules address from the RedirHub dashboard: it starts with https://."
 msgstr ""
 
-#: includes/Admin/Page.php:281
+#: includes/Admin/Page.php:283
 msgid "The rules address must start with https://."
 msgstr ""
 
-#: includes/Admin/Page.php:328
+#: includes/Admin/Page.php:330
 msgid "Not connected"
 msgstr ""
 
-#: includes/Admin/Page.php:329
-msgid "Cannot download the rules"
-msgstr ""
-
-#: includes/Admin/Page.php:330
-msgid "Sync stopped"
-msgstr ""
-
 #: includes/Admin/Page.php:331
-msgid "Waiting for RedirHub’s check"
+msgid "Redirects can’t update"
 msgstr ""
 
 #: includes/Admin/Page.php:332
+msgid "Updates stopped"
+msgstr ""
+
+#: includes/Admin/Page.php:333
+msgid "Almost done: verify your domain"
+msgstr ""
+
+#: includes/Admin/Page.php:334
 msgid "Connected"
 msgstr ""
 
-#: includes/Admin/Page.php:347
-msgid "Serve your RedirHub redirects from this site"
+#: includes/Admin/Page.php:349
+msgid "Every old link, on the right page"
 msgstr ""
 
-#: includes/Admin/Page.php:348
-msgid "Keep your DNS where it is. This site downloads your domain’s redirect rules from RedirHub and answers them itself: old pages, short links, campaign links and catch-alls, with every click in RedirHub’s analytics."
+#: includes/Admin/Page.php:350
+msgid "Redirect moved pages, move a whole site without losing its search rankings, and run short links on your own domain, then see who clicks. Nothing to change on your server or DNS: you manage the redirects in RedirHub, and this site keeps them in sync."
 msgstr ""
 
 #. translators: %s: link to the RedirHub dashboard.
-#: includes/Admin/Page.php:354
+#: includes/Admin/Page.php:356
 #, php-format
 msgid "In %s, add this site’s domain and choose “Connect through your own platform”, then WordPress."
 msgstr ""
 
-#: includes/Admin/Page.php:355
+#: includes/Admin/Page.php:357
 msgid "the RedirHub dashboard"
 msgstr ""
 
-#: includes/Admin/Page.php:359
-msgid "Copy the rules address and the integration key it shows."
+#: includes/Admin/Page.php:361
+msgid "Copy the two values it shows: the rules address and the integration key."
 msgstr ""
 
-#: includes/Admin/Page.php:360
-msgid "Paste them here and connect. Then press “Check now” in the dashboard."
+#: includes/Admin/Page.php:362
+msgid "Paste them here and connect, then press “Check now” in the dashboard. That’s it."
 msgstr ""
 
-#: includes/Admin/Page.php:381
-#: includes/Admin/Page.php:774
+#: includes/Admin/Page.php:385
+#: includes/Admin/Page.php:782
 #: includes/Admin/SiteHealth.php:97
 msgid "Rules address"
 msgstr ""
 
-#: includes/Admin/Page.php:384
+#: includes/Admin/Page.php:388
 msgid "Set in wp-config.php (REDIRHUB_RULES_URL)."
 msgstr ""
 
-#: includes/Admin/Page.php:387
+#: includes/Admin/Page.php:391
+msgid "Leave empty to keep the address you saved. You can also paste the whole setup text: the address is picked out of it."
+msgstr ""
+
+#: includes/Admin/Page.php:391
 msgid "You can also paste the whole setup text: the address is picked out of it."
 msgstr ""
 
-#: includes/Admin/Page.php:391
-#: includes/Admin/Page.php:775
+#: includes/Admin/Page.php:395
+#: includes/Admin/Page.php:783
 msgid "Integration key"
 msgstr ""
 
-#: includes/Admin/Page.php:391
-msgid "(for analytics)"
+#: includes/Admin/Page.php:395
+msgid "(to count clicks)"
 msgstr ""
 
-#: includes/Admin/Page.php:394
+#: includes/Admin/Page.php:398
 msgid "Set in wp-config.php (REDIRHUB_INTEGRATION_KEY)."
 msgstr ""
 
-#: includes/Admin/Page.php:397
-msgid "Only workspace managers see it in the dashboard. Without it, redirects work but are not counted."
+#: includes/Admin/Page.php:401
+msgid "Optional: without it your redirects work, but their clicks are not counted. Workspace managers find it in the dashboard."
 msgstr ""
 
-#: includes/Admin/Page.php:397
+#: includes/Admin/Page.php:401
 msgid "Leave empty to keep the key you saved."
 msgstr ""
 
-#: includes/Admin/Page.php:413
-#: includes/Admin/SiteHealth.php:106
-msgid "Rules"
+#: includes/Admin/Page.php:417
+#: includes/Admin/SiteHealth.php:52
+msgid "Redirects"
 msgstr ""
 
 #. translators: %s: hostnames.
-#: includes/Admin/Page.php:422
-#, php-format
-msgid "for %s"
-msgstr ""
-
 #: includes/Admin/Page.php:426
-#: includes/Admin/SiteHealth.php:114
-msgid "Checked for changes"
+#, php-format
+msgid "live on %s"
 msgstr ""
 
-#: includes/Admin/Page.php:427
-msgid "Last change"
+#: includes/Admin/Page.php:430
+msgid "Checked"
+msgstr ""
+
+#: includes/Admin/Page.php:431
+msgid "Last updated"
 msgstr ""
 
 #. translators: %d: seconds.
-#: includes/Admin/Page.php:431
+#: includes/Admin/Page.php:435
 #, php-format
-msgid "Checks again every %d seconds"
+msgid "Changes you make in RedirHub arrive within %d seconds"
 msgstr ""
 
 #. translators: 1: when, 2: the error.
-#: includes/Admin/Page.php:439
+#: includes/Admin/Page.php:443
 #, php-format
-msgid "Last try %1$s failed: %2$s The last good copy stays in use."
-msgstr ""
-
-#: includes/Admin/Page.php:444
-msgid "Sync now"
+msgid "Couldn’t update %1$s: %2$s Your redirects keep working with the last good copy."
 msgstr ""
 
 #: includes/Admin/Page.php:448
-msgid "RedirHub’s check"
-msgstr ""
-
-#: includes/Admin/Page.php:450
-msgid "Waiting"
-msgstr ""
-
-#: includes/Admin/Page.php:451
-msgid "RedirHub has not called this site’s check path yet. Press “Check now” on the domain in the RedirHub dashboard; the domain is connected once it answers."
+msgid "Update now"
 msgstr ""
 
 #: includes/Admin/Page.php:452
+msgid "Domain verified"
+msgstr ""
+
+#: includes/Admin/Page.php:454
+msgid "Not yet"
+msgstr ""
+
+#: includes/Admin/Page.php:455
+msgid "One last step: press “Check now” on your domain in the RedirHub dashboard. As soon as it reaches this site, your domain is verified."
+msgstr ""
+
+#: includes/Admin/Page.php:456
 msgid "Open RedirHub"
 msgstr ""
 
-#: includes/Admin/Page.php:460
-msgid "RedirHub calls the check path regularly to see that this site serves its latest rules."
+#: includes/Admin/Page.php:464
+msgid "RedirHub keeps checking that this site runs your latest redirects, so you hear about it if anything breaks."
 msgstr ""
 
-#: includes/Admin/Page.php:465
-#: includes/Admin/Page.php:728
-msgid "Analytics"
-msgstr ""
-
-#: includes/Admin/Page.php:467
-msgid "Off"
-msgstr ""
-
-#: includes/Admin/Page.php:468
-msgid "Add the integration key below to count every redirect in RedirHub."
-msgstr ""
-
-#: includes/Admin/Page.php:468
-msgid "Reports are switched off in the settings below."
-msgstr ""
-
-#: includes/Admin/Page.php:470
-msgid "Not offered"
+#: includes/Admin/Page.php:469
+#: includes/Admin/Page.php:736
+msgid "Click tracking"
 msgstr ""
 
 #: includes/Admin/Page.php:471
-msgid "The rules file names no address for reports."
+msgid "Off"
 msgstr ""
 
-#: includes/Admin/Page.php:473
+#: includes/Admin/Page.php:472
+msgid "Add the integration key below to see how often each link is clicked."
+msgstr ""
+
+#: includes/Admin/Page.php:472
+msgid "Switched off in the settings below."
+msgstr ""
+
+#: includes/Admin/Page.php:474
+msgid "Not available"
+msgstr ""
+
+#: includes/Admin/Page.php:475
+msgid "Click tracking is not available for this domain."
+msgstr ""
+
+#: includes/Admin/Page.php:477
 msgid "On"
 msgstr ""
 
-#: includes/Admin/Page.php:474
-msgid "Every redirect is reported to RedirHub. Nothing to report yet."
+#: includes/Admin/Page.php:478
+msgid "Every click on a redirect is counted. No clicks yet."
 msgstr ""
 
-#: includes/Admin/Page.php:474
-msgid "Last report sent. Every redirect is counted in RedirHub."
+#: includes/Admin/Page.php:478
+msgid "Last click counted. See them all in your RedirHub stats."
 msgstr ""
 
 #. translators: 1: when, 2: the error.
-#: includes/Admin/Page.php:479
+#: includes/Admin/Page.php:483
 #, php-format
-msgid "A report failed %1$s (%2$s). Reports are not retried."
+msgid "Some clicks could not be counted %1$s (%2$s)."
 msgstr ""
 
-#: includes/Admin/Page.php:487
-msgid "Test"
+#: includes/Admin/Page.php:491
+msgid "Test your redirects"
 msgstr ""
 
-#: includes/Admin/Page.php:488
-msgid "Requests this site’s check path and one of its redirects over the internet, the way RedirHub and your visitors do, through any cache or CDN in front."
+#: includes/Admin/Page.php:492
+msgid "Opens your domain from the outside, as a visitor would, through any cache or CDN in front of your site, and tells you what to fix if something is in the way."
 msgstr ""
 
-#: includes/Admin/Page.php:489
+#: includes/Admin/Page.php:493
 msgid "Run the test"
 msgstr ""
 
-#: includes/Admin/Page.php:501
+#: includes/Admin/Page.php:505
 msgid "Test results"
 msgstr ""
 
-#: includes/Admin/Page.php:519
+#: includes/Admin/Page.php:523
 msgid "Plain permalinks are on, so the web server answers unknown paths itself and they never reach WordPress. Choose any other structure under Settings → Permalinks."
 msgstr ""
 
 #. translators: %s: a path such as /blog/.
-#: includes/Admin/Page.php:524
+#: includes/Admin/Page.php:528
 #, php-format
 msgid "WordPress runs under %s: only requests below it reach this plugin, and RedirHub checks the site at the root. Serve WordPress at the root, or use another integration for this domain."
 msgstr ""
 
-#: includes/Admin/Page.php:527
+#: includes/Admin/Page.php:531
 msgid "This site’s address starts with http://. RedirHub checks the site over HTTPS, so the domain needs a certificate."
 msgstr ""
 
-#. translators: %s: names of cache plugins.
-#: includes/Admin/Page.php:532
-#, php-format
-msgid "Page cache found (%s). When the rules change, the plugin purges the pages of the changed paths so a cached page cannot hide a redirect. A CDN or host cache it cannot reach may need a purge by hand; the test above shows it."
+#: includes/Admin/Page.php:535
+msgid "A proxy or CDN stands in front of this site, but visitor addresses are taken from the connection, which is the proxy’s. Every visitor then shares one address: in analytics, and for the limit on password attempts. Choose the proxy’s header under Settings below."
 msgstr ""
 
-#: includes/Admin/Page.php:535
+#. translators: %s: names of cache plugins.
+#: includes/Admin/Page.php:540
+#, php-format
+msgid "Page cache found (%s). When a redirect changes, its old cached page is cleared for you, so it can’t get in the way. A CDN or host cache the plugin can’t reach may need clearing by hand; the test shows it."
+msgstr ""
+
+#: includes/Admin/Page.php:543
 msgid "wp-content/cache cannot be written, so the rules are kept in the database. Redirects work; with many rules they are faster when that directory is writable."
 msgstr ""
 
-#: includes/Admin/Page.php:576
+#: includes/Admin/Page.php:584
 msgid "Redirects in use"
 msgstr ""
 
-#: includes/Admin/Page.php:579
+#: includes/Admin/Page.php:587
 msgid "Search redirects"
 msgstr ""
 
-#: includes/Admin/Page.php:580
+#: includes/Admin/Page.php:588
 msgid "Search paths and destinations"
 msgstr ""
 
-#: includes/Admin/Page.php:581
+#: includes/Admin/Page.php:589
 msgid "Search"
 msgstr ""
 
 #. translators: %s: link to the RedirHub dashboard.
-#: includes/Admin/Page.php:588
+#: includes/Admin/Page.php:596
 #, php-format
-msgid "Read-only: add and change redirects in %s, they reach this site within a minute."
+msgid "To add or change a redirect, use %s: it is live here within a minute."
 msgstr ""
 
-#: includes/Admin/Page.php:596
+#: includes/Admin/Page.php:604
 msgid "From"
 msgstr ""
 
-#: includes/Admin/Page.php:597
+#: includes/Admin/Page.php:605
 msgid "To"
 msgstr ""
 
-#: includes/Admin/Page.php:598
+#: includes/Admin/Page.php:606
 msgid "Type"
 msgstr ""
 
-#: includes/Admin/Page.php:599
+#: includes/Admin/Page.php:607
 msgid "Options"
 msgstr ""
 
-#: includes/Admin/Page.php:604
+#: includes/Admin/Page.php:612
 msgid "No redirects yet. Add one in RedirHub."
 msgstr ""
 
-#: includes/Admin/Page.php:604
+#: includes/Admin/Page.php:612
 msgid "No redirect matches the search."
 msgstr ""
 
-#: includes/Admin/Page.php:612
+#: includes/Admin/Page.php:620
 msgid "Every path WordPress answers with “not found”"
 msgstr ""
 
 #. translators: %s: number of redirects.
-#: includes/Admin/Page.php:629
+#: includes/Admin/Page.php:637
 #, php-format
 msgid "%s redirect"
 msgid_plural "%s redirects"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/Page.php:657
+#: includes/Admin/Page.php:665
 msgid "Permanent (301)"
 msgstr ""
 
-#: includes/Admin/Page.php:658
+#: includes/Admin/Page.php:666
 msgid "Temporary (302)"
 msgstr ""
 
-#: includes/Admin/Page.php:659
+#: includes/Admin/Page.php:667
 msgid "Temporary (307)"
 msgstr ""
 
-#: includes/Admin/Page.php:660
+#: includes/Admin/Page.php:668
 msgid "Permanent (308)"
 msgstr ""
 
-#: includes/Admin/Page.php:661
+#: includes/Admin/Page.php:669
 msgid "Frame page"
 msgstr ""
 
-#: includes/Admin/Page.php:675
+#: includes/Admin/Page.php:683
 msgid "keeps the path"
 msgstr ""
 
-#: includes/Admin/Page.php:678
+#: includes/Admin/Page.php:686
 msgid "keeps the query"
 msgstr ""
 
-#: includes/Admin/Page.php:683
+#: includes/Admin/Page.php:691
 msgid "password"
 msgstr ""
 
-#: includes/Admin/Page.php:686
+#: includes/Admin/Page.php:694
 msgid "rotates in turn"
 msgstr ""
 
-#: includes/Admin/Page.php:686
+#: includes/Admin/Page.php:694
 msgid "rotates at random"
 msgstr ""
 
-#: includes/Admin/Page.php:690
+#: includes/Admin/Page.php:698
 msgid "blocks bots"
 msgstr ""
 
-#: includes/Admin/Page.php:693
+#: includes/Admin/Page.php:701
 msgid "WeChat page"
 msgstr ""
 
-#: includes/Admin/Page.php:700
+#: includes/Admin/Page.php:708
 msgid "options off"
 msgstr ""
 
-#: includes/Admin/Page.php:716
+#: includes/Admin/Page.php:724
 msgid "The connection (recommended unless a proxy stands in front)"
 msgstr ""
 
-#: includes/Admin/Page.php:717
+#: includes/Admin/Page.php:725
 msgid "Cloudflare’s CF-Connecting-IP header"
 msgstr ""
 
-#: includes/Admin/Page.php:718
+#: includes/Admin/Page.php:726
 msgid "The X-Real-IP header my proxy sets"
 msgstr ""
 
-#: includes/Admin/Page.php:719
+#: includes/Admin/Page.php:727
 msgid "Another header my proxy sets:"
 msgstr ""
 
-#: includes/Admin/Page.php:729
-msgid "Report each redirect (and, where the domain asks, each “not found” page) to RedirHub’s analytics"
-msgstr ""
-
-#: includes/Admin/Page.php:730
-msgid "Sent after the visitor has their answer: address, time, page, referrer and browser, as in a web server log. No cookies."
-msgstr ""
-
-#: includes/Admin/Page.php:733
-msgid "Link options"
-msgstr ""
-
-#: includes/Admin/Page.php:734
-msgid "Carry out passwords, bot and WeChat blocking and rotating destinations set on a link"
-msgstr ""
-
-#: includes/Admin/Page.php:735
-msgid "Off: such links redirect plainly to their main destination."
+#: includes/Admin/Page.php:737
+msgid "Count every click on a redirect, and every “not found” page if you turned that on for the domain"
 msgstr ""
 
 #: includes/Admin/Page.php:738
-msgid "Visitor address"
+msgid "Visitors never wait for it. What is counted: address, time, page, referrer and browser, as in a web server log. No cookies."
 msgstr ""
 
 #: includes/Admin/Page.php:741
+msgid "Link extras"
+msgstr ""
+
+#: includes/Admin/Page.php:742
+msgid "Use the password, bot blocking, WeChat help and rotating destinations you set on a link"
+msgstr ""
+
+#: includes/Admin/Page.php:743
+msgid "Off: such links simply redirect to their main destination."
+msgstr ""
+
+#: includes/Admin/Page.php:746
+msgid "Visitor address"
+msgstr ""
+
+#: includes/Admin/Page.php:749
 msgid "Where the visitor’s address comes from"
 msgstr ""
 
-#: includes/Admin/Page.php:753
+#: includes/Admin/Page.php:761
 msgid "Choose a header only if a proxy in front of this site overwrites it: a visitor can send any header. Your own address is shown next to each source."
 msgstr ""
 
-#: includes/Admin/Page.php:758
+#: includes/Admin/Page.php:766
 msgid "Save settings"
 msgstr ""
 
-#: includes/Admin/Page.php:771
+#: includes/Admin/Page.php:779
 msgid "Connection"
 msgstr ""
 
-#: includes/Admin/Page.php:775
+#: includes/Admin/Page.php:783
 msgid "none"
 msgstr ""
 
-#: includes/Admin/Page.php:776
+#: includes/Admin/Page.php:784
 msgid "Change"
 msgstr ""
 
-#: includes/Admin/Page.php:782
+#: includes/Admin/Page.php:790
 msgid "Save and download"
 msgstr ""
 
-#: includes/Admin/Page.php:788
+#: includes/Admin/Page.php:796
 msgid "Disconnect this site"
 msgstr ""
 
 #. translators: 1: plugin version, 2: format version.
-#: includes/Admin/Page.php:793
+#: includes/Admin/Page.php:801
 #, php-format
 msgid "RedirHub Redirects %1$s · rules file format %2$s"
 msgstr ""
 
-#: includes/Admin/Page.php:811
+#: includes/Admin/Page.php:819
 msgid "Working…"
 msgstr ""
 
@@ -573,21 +579,21 @@ msgid "This site answers as %1$s, the rules file is for %2$s. Requests for other
 msgstr ""
 
 #: includes/Admin/SelfTest.php:56
-msgid "No exact redirect to test"
+msgid "Nothing to test yet"
 msgstr ""
 
 #: includes/Admin/SelfTest.php:57
-msgid "The rules of this domain hold no plain redirect yet."
+msgid "Add a redirect for this domain in RedirHub, then run the test again."
 msgstr ""
 
 #: includes/Admin/SelfTest.php:89
-msgid "RedirHub can check this site"
+msgid "Your domain can be verified"
 msgstr ""
 
 #. translators: %s: a URL.
 #: includes/Admin/SelfTest.php:101
 #, php-format
-msgid "%s answers with this site’s token and the current rules."
+msgid "RedirHub reaches this site at %s and sees your latest redirects."
 msgstr ""
 
 #: includes/Admin/SelfTest.php:105
@@ -603,13 +609,13 @@ msgstr ""
 #. translators: %s: a path such as /old-page.
 #: includes/Admin/SelfTest.php:133
 #, php-format
-msgid "Redirects work (%s)"
+msgid "Your redirects work (%s)"
 msgstr ""
 
 #. translators: 1: an HTTP status code, 2: a URL.
 #: includes/Admin/SelfTest.php:150
 #, php-format
-msgid "Answered %1$d to %2$s."
+msgid "A visitor is sent on to %2$s (%1$d)."
 msgstr ""
 
 #: includes/Admin/SelfTest.php:154
@@ -641,31 +647,31 @@ msgid "RedirHub redirects"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:49
-msgid "RedirHub redirects are served with the latest rules"
-msgstr ""
-
-#: includes/Admin/SiteHealth.php:52
-msgid "Redirects"
+msgid "Your redirects are up to date"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:55
-msgid "This site downloads its redirect rules from RedirHub and serves them."
+msgid "Old and short links on this site land where you set them in RedirHub."
+msgstr ""
+
+#: includes/Admin/SiteHealth.php:56
+msgid "Open RedirHub Redirects"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:61
-msgid "RedirHub redirects cannot be downloaded"
+msgid "Your redirects can’t be updated"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:61
-msgid "RedirHub redirects are out of date"
+msgid "Your redirects may be out of date"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:65
-msgid "RedirHub has not checked this site yet"
+msgid "Your domain is not verified yet"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:66
-msgid "Press “Check now” on the domain in the RedirHub dashboard to finish connecting it."
+msgid "Press “Check now” on your domain in the RedirHub dashboard to finish connecting it."
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:89
@@ -678,6 +684,14 @@ msgstr ""
 
 #: includes/Admin/SiteHealth.php:102
 msgid "Hostnames"
+msgstr ""
+
+#: includes/Admin/SiteHealth.php:106
+msgid "Rules"
+msgstr ""
+
+#: includes/Admin/SiteHealth.php:114
+msgid "Checked for changes"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:118
@@ -695,7 +709,7 @@ msgstr ""
 #. translators: %s: the error message of the HTTP request.
 #: includes/Admin/Status.php:87
 #, php-format
-msgid "RedirHub could not be reached from this server: %s"
+msgid "Couldn’t reach RedirHub from this server (%s). Your redirects keep working with the last good copy."
 msgstr ""
 
 #: includes/Admin/Status.php:90
@@ -705,7 +719,7 @@ msgstr ""
 #. translators: %s: an HTTP status code.
 #: includes/Admin/Status.php:93
 #, php-format
-msgid "RedirHub answered with status %s. The plugin keeps using the last good copy and tries again shortly."
+msgid "RedirHub answered with an error (%s). Your redirects keep working with the last good copy; the plugin tries again shortly."
 msgstr ""
 
 #: includes/Admin/Status.php:95

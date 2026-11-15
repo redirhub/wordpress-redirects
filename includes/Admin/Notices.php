@@ -36,7 +36,7 @@ final class Notices {
 		if ( Status::OFF === $level && null !== $screen && 'plugins' === $screen->id ) {
 			printf(
 				'<div class="notice notice-info"><p>%1$s <a href="%2$s" class="button button-primary">%3$s</a></p></div>',
-				esc_html__( 'RedirHub Redirects is active. Connect it to your RedirHub domain to start serving redirects.', 'redirhub-redirects' ),
+				esc_html__( 'Almost there: connect your domain, and every old link starts landing on the right page.', 'redirhub-redirects' ),
 				esc_url( Page::url() ),
 				esc_html__( 'Connect', 'redirhub-redirects' )
 			);
@@ -47,10 +47,10 @@ final class Notices {
 			$state = State::get();
 			printf(
 				'<div class="notice notice-error"><p><strong>%1$s</strong> %2$s <a href="%3$s">%4$s</a></p></div>',
-				esc_html__( 'RedirHub Redirects cannot download the rules.', 'redirhub-redirects' ),
+				esc_html__( 'Your redirects can’t be updated.', 'redirhub-redirects' ),
 				esc_html( Status::error_text( (string) $state['error'] ) ),
 				esc_url( Page::url() ),
-				esc_html__( 'Open RedirHub Redirects', 'redirhub-redirects' )
+				esc_html__( 'See what to do', 'redirhub-redirects' )
 			);
 		}
 	}

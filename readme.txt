@@ -8,22 +8,31 @@ Stable tag: 1.0.0
 License: Apache-2.0
 License URI: https://www.apache.org/licenses/LICENSE-2.0
 
-Serve your RedirHub redirects from WordPress without moving DNS: migrations, short links and catch-alls, with click analytics.
+Send every old, moved or mistyped link to the right page. Keep your search rankings, run short links on your own domain, see every click.
 
 == Description ==
 
-[RedirHub](https://www.redirhub.com) manages redirects for whole domains: site migrations with thousands of mappings, branded short links, QR codes, campaign links. Usually a domain points its DNS at RedirHub. With this plugin your WordPress site serves them itself and your DNS stays where it is.
+Pages move. Products get renamed. Sites change domain. Links get printed on flyers and shared in chats, and keep being clicked for years. Every one of those clicks should land somewhere useful, not on a "page not found".
 
-* **Connect once.** Paste the rules address (and, for analytics, the integration key) from the RedirHub dashboard. The plugin downloads your domain's rules and redirects at once.
-* **Manage in RedirHub.** Add and change redirects in the dashboard, in bulk, by API or with an AI assistant; they reach your site within a minute.
-* **Fast.** Exact redirects are answered while WordPress loads, before your theme and other plugins. The rules are kept in a PHP file that OPcache holds in memory, so 50,000 rules answer as fast as five (about 5 ms on a small server, against 40 ms for a page).
-* **Safe.** Only GET and HEAD requests on your domain are touched. A catch-all redirects only pages WordPress cannot find, never a working page. When anything is wrong, RedirHub unreachable or a broken download, the site keeps using the last good copy, or answers as if the plugin were not there.
-* **Every click counted.** With the integration key, each redirect is reported to RedirHub's analytics after the visitor has their answer, as a web server log line. Pages WordPress cannot find can be reported too, so you see which old links still need a redirect.
-* **Everything a link can do.** Permanent and temporary redirects, frame pages, keeping the query or the path, password-protected links, links that rotate between destinations, keeping bots out, and the "open in your browser" page for WeChat.
-* **Plays well with page caches.** When the rules change, the plugin purges the changed pages in WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, Cache Enabler, SiteGround Optimizer and others, so a cached page never hides a new redirect.
-* **Shows you what is going on.** Tools → RedirHub shows the rules in use, when RedirHub last checked the site, the analytics reports, and a one-click test through any cache or CDN in front of the site. Problems also appear in Site Health and as an admin notice.
+RedirHub Redirects makes sure they do, without touching your server, your hosting or your DNS.
 
-The rules file format is an open specification: [redirhub/integration-spec](https://github.com/redirhub/integration-spec). This plugin passes its golden sample.
+= What you get =
+
+* **Keep your search rankings when URLs change.** Permanent redirects tell Google where a page went, so its ranking moves with it. Moving a whole site? Map thousands of old URLs to new ones at once.
+* **No more dead ends.** Send every page your site cannot find to a page of your choice. Pages that work are never touched.
+* **See what your links do.** Clicks per link, where visitors came from, their country and browser. Plus the "not found" pages people still try to open, so you know exactly which redirect is missing.
+* **Short links on your own domain.** `yoursite.com/spring` for a campaign, a QR code or a flyer. Change where it goes at any time, without reprinting anything.
+* **Links that do more.** Protect a link with a password, split visitors between several destinations, keep bots away from a link, or help WeChat users open it in their browser.
+* **Fast.** Redirects are answered before your theme loads: about 5 ms, even with 50,000 of them, against 40 ms or more for a normal page.
+* **Safe.** Only the addresses you set up are redirected. If anything goes wrong, your site behaves as if the plugin were not there, and your redirects keep working with the last good copy.
+* **Works with your cache.** When a redirect changes, the plugin clears the affected pages in WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, Cache Enabler, SiteGround Optimizer and more, so an old cached page never gets in the way.
+* **You always know it works.** One click tests your redirects from the outside, the way a visitor reaches them, through any cache or CDN. Problems show up on the plugin's page, as an admin notice and in Site Health.
+
+= How it works =
+
+You manage your redirects in the RedirHub dashboard: one by one, from a spreadsheet, by API, or by asking an AI assistant. This plugin keeps your site in sync within a minute and answers them itself. Your domain stays exactly where it is.
+
+You need a [RedirHub](https://www.redirhub.com) account.
 
 = External service =
 
@@ -39,16 +48,20 @@ RedirHub's [terms of service](https://www.redirhub.com/terms) and [privacy polic
 
 1. Install and activate the plugin.
 2. In the RedirHub dashboard, add your domain and choose **Connect through your own platform**, then **WordPress**.
-3. Copy the rules address and the integration key into **Tools → RedirHub** and press **Connect**.
-4. Press **Check now** on the domain in the RedirHub dashboard. Done.
+3. Copy the two values it shows into **Tools → RedirHub** and press **Connect**.
+4. Press **Check now** on the domain in the RedirHub dashboard. Your redirects are live.
 
 Prefer configuration in code? Define `REDIRHUB_RULES_URL` and `REDIRHUB_INTEGRATION_KEY` in `wp-config.php`; the admin page then shows them read-only.
 
 == Frequently Asked Questions ==
 
-= Do I need to change my DNS? =
+= Do I need to change my DNS or my server? =
 
-No. That is the point of the plugin: your domain keeps pointing at your WordPress host.
+No. Your domain keeps pointing at your current host, and there is nothing to set up on the server.
+
+= Will redirects slow my site down? =
+
+No. Redirects are answered before WordPress loads your theme and most plugins, in a few milliseconds. Your normal pages are not affected.
 
 = Which requests does the plugin touch? =
 
@@ -76,9 +89,9 @@ Analytics reports and link options (passwords, bot and WeChat blocking, rotating
 
 == Screenshots ==
 
-1. Connecting the site: paste the rules address and the key.
-2. Connected: the rules in use, RedirHub's check, analytics, and the test.
-3. The redirects in use, searchable.
+1. Connect your domain in a minute: paste two values and you are done.
+2. See at a glance that your redirects are live, verified and counted, and test them from the outside.
+3. Every redirect your site serves, searchable.
 
 == Changelog ==
 

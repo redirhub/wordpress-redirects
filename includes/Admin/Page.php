@@ -144,14 +144,14 @@ final class Page {
 		$site     = Status::site_host();
 		if ( null !== $rules ) {
 			/* translators: 1: number of rules, 2: list of hostnames. */
-			$messages[] = array( 'success', sprintf( _n( 'Connected. %1$d rule for %2$s is in use.', 'Connected. %1$d rules for %2$s are in use.', $rules->count(), 'redirhub-redirects' ), $rules->count(), implode( ', ', $rules->hostnames() ) ) );
+			$messages[] = array( 'success', sprintf( _n( 'Connected. %1$d redirect for %2$s is live.', 'Connected. %1$d redirects for %2$s are live.', $rules->count(), 'redirhub-redirects' ), $rules->count(), implode( ', ', $rules->hostnames() ) ) );
 			if ( ! $rules->has_host( $site ) ) {
 				/* translators: 1: the site's hostname, 2: hostnames. */
-				$messages[] = array( 'warning', sprintf( __( 'This site answers as %1$s, but the rules file is for %2$s. Only requests for those hostnames are redirected.', 'redirhub-redirects' ), $site, implode( ', ', $rules->hostnames() ) ) );
+				$messages[] = array( 'warning', sprintf( __( 'This site’s address is %1$s, but these redirects are for %2$s: only visits to those addresses are redirected.', 'redirhub-redirects' ), $site, implode( ', ', $rules->hostnames() ) ) );
 			}
 		}
 		if ( '' === Settings::key() ) {
-			$messages[] = array( 'info', __( 'Redirects work without the integration key; add it to see their clicks in RedirHub’s analytics.', 'redirhub-redirects' ) );
+			$messages[] = array( 'info', __( 'Your redirects work now. Add the integration key to also see how often each one is clicked.', 'redirhub-redirects' ) );
 		}
 		self::back( $messages );
 	}
@@ -162,10 +162,10 @@ final class Page {
 		$result = Sync::run( true );
 		switch ( $result['status'] ) {
 			case 'updated':
-				$message = $result['changed'] ? array( 'success', __( 'New rules downloaded and in use.', 'redirhub-redirects' ) ) : array( 'success', __( 'The rules are up to date.', 'redirhub-redirects' ) );
+				$message = $result['changed'] ? array( 'success', __( 'Your latest redirects are live.', 'redirhub-redirects' ) ) : array( 'success', __( 'Your redirects are up to date.', 'redirhub-redirects' ) );
 				break;
 			case 'unchanged':
-				$message = array( 'success', __( 'The rules are up to date.', 'redirhub-redirects' ) );
+				$message = array( 'success', __( 'Your redirects are up to date.', 'redirhub-redirects' ) );
 				break;
 			case 'busy':
 				$message = array( 'warning', __( 'Another download is running. Try again in a moment.', 'redirhub-redirects' ) );
@@ -210,7 +210,7 @@ final class Page {
 		wp_clear_scheduled_hook( Sync::HOOK );
 		$message = Settings::rules_url_is_constant()
 			? array( 'warning', __( 'The rules address is set in wp-config.php: remove REDIRHUB_RULES_URL there to disconnect for good.', 'redirhub-redirects' ) )
-			: array( 'success', __( 'Disconnected. This site no longer serves RedirHub redirects.', 'redirhub-redirects' ) );
+			: array( 'success', __( 'Disconnected. This site no longer redirects anything; your pages work as before.', 'redirhub-redirects' ) );
 		self::back( array( $message ) );
 	}
 
@@ -328,9 +328,9 @@ final class Page {
 	private static function pill( string $level ): string {
 		$labels = array(
 			Status::OFF     => __( 'Not connected', 'redirhub-redirects' ),
-			Status::FAILING => __( 'Cannot download the rules', 'redirhub-redirects' ),
-			Status::STALE   => __( 'Sync stopped', 'redirhub-redirects' ),
-			Status::WAITING => __( 'Waiting for RedirHub’s check', 'redirhub-redirects' ),
+			Status::FAILING => __( 'Redirects can’t update', 'redirhub-redirects' ),
+			Status::STALE   => __( 'Updates stopped', 'redirhub-redirects' ),
+			Status::WAITING => __( 'Almost done: verify your domain', 'redirhub-redirects' ),
 			Status::OK      => __( 'Connected', 'redirhub-redirects' ),
 		);
 
@@ -346,8 +346,8 @@ final class Page {
 		?>
 		<div class="rh-hero">
 			<div class="rh-hero__text">
-				<h2><?php esc_html_e( 'Serve your RedirHub redirects from this site', 'redirhub-redirects' ); ?></h2>
-				<p><?php esc_html_e( 'Keep your DNS where it is. This site downloads your domain’s redirect rules from RedirHub and answers them itself: old pages, short links, campaign links and catch-alls, with every click in RedirHub’s analytics.', 'redirhub-redirects' ); ?></p>
+				<h2><?php esc_html_e( 'Every old link, on the right page', 'redirhub-redirects' ); ?></h2>
+				<p><?php esc_html_e( 'Redirect moved pages, move a whole site without losing its search rankings, and run short links on your own domain, then see who clicks. Nothing to change on your server or DNS: you manage the redirects in RedirHub, and this site keeps them in sync.', 'redirhub-redirects' ); ?></p>
 				<ol class="rh-steps">
 					<li>
 						<?php
@@ -358,8 +358,8 @@ final class Page {
 						);
 						?>
 					</li>
-					<li><?php esc_html_e( 'Copy the rules address and the integration key it shows.', 'redirhub-redirects' ); ?></li>
-					<li><?php esc_html_e( 'Paste them here and connect. Then press “Check now” in the dashboard.', 'redirhub-redirects' ); ?></li>
+					<li><?php esc_html_e( 'Copy the two values it shows: the rules address and the integration key.', 'redirhub-redirects' ); ?></li>
+					<li><?php esc_html_e( 'Paste them here and connect, then press “Check now” in the dashboard. That’s it.', 'redirhub-redirects' ); ?></li>
 				</ol>
 			</div>
 			<form class="rh-card rh-connect" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -392,13 +392,13 @@ final class Page {
 			<?php endif; ?>
 		</p>
 		<p>
-			<label for="rh-key"><strong><?php esc_html_e( 'Integration key', 'redirhub-redirects' ); ?></strong> <span class="rh-optional"><?php esc_html_e( '(for analytics)', 'redirhub-redirects' ); ?></span></label><br>
+			<label for="rh-key"><strong><?php esc_html_e( 'Integration key', 'redirhub-redirects' ); ?></strong> <span class="rh-optional"><?php esc_html_e( '(to count clicks)', 'redirhub-redirects' ); ?></span></label><br>
 			<?php if ( Settings::key_is_constant() ) : ?>
 				<input type="text" id="rh-key" class="regular-text code" value="<?php echo esc_attr( self::mask_key( Settings::key() ) ); ?>" readonly>
 				<span class="description"><?php esc_html_e( 'Set in wp-config.php (REDIRHUB_INTEGRATION_KEY).', 'redirhub-redirects' ); ?></span>
 			<?php else : ?>
 				<input type="password" id="rh-key" name="key" class="regular-text code" autocomplete="new-password" spellcheck="false" placeholder="<?php echo '' === Settings::key() ? '' : esc_attr( self::mask_key( Settings::key() ) ); ?>">
-				<span class="description"><?php echo '' === Settings::key() ? esc_html__( 'Only workspace managers see it in the dashboard. Without it, redirects work but are not counted.', 'redirhub-redirects' ) : esc_html__( 'Leave empty to keep the key you saved.', 'redirhub-redirects' ); ?></span>
+				<span class="description"><?php echo '' === Settings::key() ? esc_html__( 'Optional: without it your redirects work, but their clicks are not counted. Workspace managers find it in the dashboard.', 'redirhub-redirects' ) : esc_html__( 'Leave empty to keep the key you saved.', 'redirhub-redirects' ); ?></span>
 			<?php endif; ?>
 		</p>
 		<?php
@@ -413,8 +413,8 @@ final class Page {
 		$reports  = $activity['reports'];
 		?>
 		<div class="rh-grid">
-			<div class="rh-card">
-				<h2><?php esc_html_e( 'Rules', 'redirhub-redirects' ); ?></h2>
+			<div class="rh-card" data-card="rules">
+				<h2><?php esc_html_e( 'Redirects', 'redirhub-redirects' ); ?></h2>
 				<?php if ( null === $rules ) : ?>
 					<p class="rh-big">—</p>
 					<p class="rh-bad"><?php echo esc_html( Status::error_text( (string) $state['error'] ) ); ?></p>
@@ -423,16 +423,16 @@ final class Page {
 					<p>
 						<?php
 						/* translators: %s: hostnames. */
-						printf( esc_html__( 'for %s', 'redirhub-redirects' ), '<code>' . esc_html( implode( ', ', $rules->hostnames() ) ) . '</code>' );
+						printf( esc_html__( 'live on %s', 'redirhub-redirects' ), '<code>' . esc_html( implode( ', ', $rules->hostnames() ) ) . '</code>' );
 						?>
 					</p>
 					<ul class="rh-facts">
-						<li><?php esc_html_e( 'Checked for changes', 'redirhub-redirects' ); ?> <strong><?php echo esc_html( Status::ago( (int) $state['fetched_at'] ) ); ?></strong></li>
-						<li><?php esc_html_e( 'Last change', 'redirhub-redirects' ); ?> <strong><?php echo esc_html( Status::ago( (int) $state['changed_at'] ) ); ?></strong></li>
+						<li><?php esc_html_e( 'Checked', 'redirhub-redirects' ); ?> <strong><?php echo esc_html( Status::ago( (int) $state['fetched_at'] ) ); ?></strong></li>
+						<li><?php esc_html_e( 'Last updated', 'redirhub-redirects' ); ?> <strong><?php echo esc_html( Status::ago( (int) $state['changed_at'] ) ); ?></strong></li>
 						<li>
 							<?php
 							/* translators: %d: seconds. */
-							printf( esc_html__( 'Checks again every %d seconds', 'redirhub-redirects' ), (int) $state['refresh'] );
+							printf( esc_html__( 'Changes you make in RedirHub arrive within %d seconds', 'redirhub-redirects' ), (int) $state['refresh'] );
 							?>
 						</li>
 					</ul>
@@ -440,19 +440,19 @@ final class Page {
 						<p class="rh-bad">
 							<?php
 							/* translators: 1: when, 2: the error. */
-							printf( esc_html__( 'Last try %1$s failed: %2$s The last good copy stays in use.', 'redirhub-redirects' ), esc_html( Status::ago( (int) $state['error_at'] ) ), esc_html( Status::error_text( (string) $state['error'] ) ) );
+							printf( esc_html__( 'Couldn’t update %1$s: %2$s Your redirects keep working with the last good copy.', 'redirhub-redirects' ), esc_html( Status::ago( (int) $state['error_at'] ) ), esc_html( Status::error_text( (string) $state['error'] ) ) );
 							?>
 						</p>
 					<?php endif; ?>
 				<?php endif; ?>
-				<?php self::button( 'sync', __( 'Sync now', 'redirhub-redirects' ) ); ?>
+				<?php self::button( 'sync', __( 'Update now', 'redirhub-redirects' ) ); ?>
 			</div>
 
-			<div class="rh-card">
-				<h2><?php esc_html_e( 'RedirHub’s check', 'redirhub-redirects' ); ?></h2>
+			<div class="rh-card" data-card="check">
+				<h2><?php esc_html_e( 'Domain verified', 'redirhub-redirects' ); ?></h2>
 				<?php if ( array() === $checks ) : ?>
-					<p class="rh-big rh-muted"><?php esc_html_e( 'Waiting', 'redirhub-redirects' ); ?></p>
-					<p><?php esc_html_e( 'RedirHub has not called this site’s check path yet. Press “Check now” on the domain in the RedirHub dashboard; the domain is connected once it answers.', 'redirhub-redirects' ); ?></p>
+					<p class="rh-big rh-muted"><?php esc_html_e( 'Not yet', 'redirhub-redirects' ); ?></p>
+					<p><?php esc_html_e( 'One last step: press “Check now” on your domain in the RedirHub dashboard. As soon as it reaches this site, your domain is verified.', 'redirhub-redirects' ); ?></p>
 					<p><a class="button" href="<?php echo esc_url( self::DASHBOARD ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Open RedirHub', 'redirhub-redirects' ); ?></a></p>
 				<?php else : ?>
 					<p class="rh-big"><?php echo esc_html( Status::ago( max( $checks ) ) ); ?></p>
@@ -461,35 +461,35 @@ final class Page {
 							<li><code><?php echo esc_html( $host ); ?></code> <strong><?php echo esc_html( Status::ago( $at ) ); ?></strong></li>
 						<?php endforeach; ?>
 					</ul>
-					<p class="rh-muted"><?php esc_html_e( 'RedirHub calls the check path regularly to see that this site serves its latest rules.', 'redirhub-redirects' ); ?></p>
+					<p class="rh-muted"><?php esc_html_e( 'RedirHub keeps checking that this site runs your latest redirects, so you hear about it if anything breaks.', 'redirhub-redirects' ); ?></p>
 				<?php endif; ?>
 			</div>
 
-			<div class="rh-card">
-				<h2><?php esc_html_e( 'Analytics', 'redirhub-redirects' ); ?></h2>
+			<div class="rh-card" data-card="reports">
+				<h2><?php esc_html_e( 'Click tracking', 'redirhub-redirects' ); ?></h2>
 				<?php if ( ! Settings::reports() ) : ?>
 					<p class="rh-big rh-muted"><?php esc_html_e( 'Off', 'redirhub-redirects' ); ?></p>
-					<p><?php echo '' === Settings::key() ? esc_html__( 'Add the integration key below to count every redirect in RedirHub.', 'redirhub-redirects' ) : esc_html__( 'Reports are switched off in the settings below.', 'redirhub-redirects' ); ?></p>
+					<p><?php echo '' === Settings::key() ? esc_html__( 'Add the integration key below to see how often each link is clicked.', 'redirhub-redirects' ) : esc_html__( 'Switched off in the settings below.', 'redirhub-redirects' ); ?></p>
 				<?php elseif ( null !== $rules && null === $rules->hits_url() ) : ?>
-					<p class="rh-big rh-muted"><?php esc_html_e( 'Not offered', 'redirhub-redirects' ); ?></p>
-					<p><?php esc_html_e( 'The rules file names no address for reports.', 'redirhub-redirects' ); ?></p>
+					<p class="rh-big rh-muted"><?php esc_html_e( 'Not available', 'redirhub-redirects' ); ?></p>
+					<p><?php esc_html_e( 'Click tracking is not available for this domain.', 'redirhub-redirects' ); ?></p>
 				<?php else : ?>
 					<p class="rh-big"><?php echo esc_html( 0 === (int) $reports['sent_at'] ? __( 'On', 'redirhub-redirects' ) : Status::ago( (int) $reports['sent_at'] ) ); ?></p>
-					<p><?php echo 0 === (int) $reports['sent_at'] ? esc_html__( 'Every redirect is reported to RedirHub. Nothing to report yet.', 'redirhub-redirects' ) : esc_html__( 'Last report sent. Every redirect is counted in RedirHub.', 'redirhub-redirects' ); ?></p>
+					<p><?php echo 0 === (int) $reports['sent_at'] ? esc_html__( 'Every click on a redirect is counted. No clicks yet.', 'redirhub-redirects' ) : esc_html__( 'Last click counted. See them all in your RedirHub stats.', 'redirhub-redirects' ); ?></p>
 					<?php if ( '' !== $reports['error'] && (int) $reports['error_at'] > (int) $reports['sent_at'] ) : ?>
 						<p class="rh-bad">
 							<?php
 							/* translators: 1: when, 2: the error. */
-							printf( esc_html__( 'A report failed %1$s (%2$s). Reports are not retried.', 'redirhub-redirects' ), esc_html( Status::ago( (int) $reports['error_at'] ) ), esc_html( (string) $reports['error'] ) );
+							printf( esc_html__( 'Some clicks could not be counted %1$s (%2$s).', 'redirhub-redirects' ), esc_html( Status::ago( (int) $reports['error_at'] ) ), esc_html( (string) $reports['error'] ) );
 							?>
 						</p>
 					<?php endif; ?>
 				<?php endif; ?>
 			</div>
 
-			<div class="rh-card">
-				<h2><?php esc_html_e( 'Test', 'redirhub-redirects' ); ?></h2>
-				<p><?php esc_html_e( 'Requests this site’s check path and one of its redirects over the internet, the way RedirHub and your visitors do, through any cache or CDN in front.', 'redirhub-redirects' ); ?></p>
+			<div class="rh-card" data-card="test">
+				<h2><?php esc_html_e( 'Test your redirects', 'redirhub-redirects' ); ?></h2>
+				<p><?php esc_html_e( 'Opens your domain from the outside, as a visitor would, through any cache or CDN in front of your site, and tells you what to fix if something is in the way.', 'redirhub-redirects' ); ?></p>
 				<?php self::button( 'test', __( 'Run the test', 'redirhub-redirects' ) ); ?>
 			</div>
 		</div>
@@ -537,7 +537,7 @@ final class Page {
 		$caches = Compat::detected();
 		if ( array() !== $caches ) {
 			/* translators: %s: names of cache plugins. */
-			$notes[] = array( 'info', sprintf( __( 'Page cache found (%s). When the rules change, the plugin purges the pages of the changed paths so a cached page cannot hide a redirect. A CDN or host cache it cannot reach may need a purge by hand; the test above shows it.', 'redirhub-redirects' ), implode( ', ', $caches ) ) );
+			$notes[] = array( 'info', sprintf( __( 'Page cache found (%s). When a redirect changes, its old cached page is cleared for you, so it can’t get in the way. A CDN or host cache the plugin can’t reach may need clearing by hand; the test shows it.', 'redirhub-redirects' ), implode( ', ', $caches ) ) );
 		}
 		if ( Store::IN_OPTION === State::get()['file'] ) {
 			$notes[] = array( 'info', __( 'wp-content/cache cannot be written, so the rules are kept in the database. Redirects work; with many rules they are faster when that directory is writable.', 'redirhub-redirects' ) );
@@ -593,7 +593,7 @@ final class Page {
 				<?php
 				printf(
 					/* translators: %s: link to the RedirHub dashboard. */
-					esc_html__( 'Read-only: add and change redirects in %s, they reach this site within a minute.', 'redirhub-redirects' ),
+					esc_html__( 'To add or change a redirect, use %s: it is live here within a minute.', 'redirhub-redirects' ),
 					'<a href="' . esc_url( self::DASHBOARD ) . '" target="_blank" rel="noopener">RedirHub</a>'
 				);
 				?>
@@ -733,14 +733,14 @@ final class Page {
 			<h2><?php esc_html_e( 'Settings', 'redirhub-redirects' ); ?></h2>
 			<table class="form-table" role="presentation">
 				<tr>
-					<th scope="row"><?php esc_html_e( 'Analytics', 'redirhub-redirects' ); ?></th>
-					<td><label><input type="checkbox" name="reports" value="1" <?php checked( $settings['reports'] ); ?>> <?php esc_html_e( 'Report each redirect (and, where the domain asks, each “not found” page) to RedirHub’s analytics', 'redirhub-redirects' ); ?></label>
-					<p class="description"><?php esc_html_e( 'Sent after the visitor has their answer: address, time, page, referrer and browser, as in a web server log. No cookies.', 'redirhub-redirects' ); ?></p></td>
+					<th scope="row"><?php esc_html_e( 'Click tracking', 'redirhub-redirects' ); ?></th>
+					<td><label><input type="checkbox" name="reports" value="1" <?php checked( $settings['reports'] ); ?>> <?php esc_html_e( 'Count every click on a redirect, and every “not found” page if you turned that on for the domain', 'redirhub-redirects' ); ?></label>
+					<p class="description"><?php esc_html_e( 'Visitors never wait for it. What is counted: address, time, page, referrer and browser, as in a web server log. No cookies.', 'redirhub-redirects' ); ?></p></td>
 				</tr>
 				<tr>
-					<th scope="row"><?php esc_html_e( 'Link options', 'redirhub-redirects' ); ?></th>
-					<td><label><input type="checkbox" name="link_options" value="1" <?php checked( $settings['link_options'] ); ?>> <?php esc_html_e( 'Carry out passwords, bot and WeChat blocking and rotating destinations set on a link', 'redirhub-redirects' ); ?></label>
-					<p class="description"><?php esc_html_e( 'Off: such links redirect plainly to their main destination.', 'redirhub-redirects' ); ?></p></td>
+					<th scope="row"><?php esc_html_e( 'Link extras', 'redirhub-redirects' ); ?></th>
+					<td><label><input type="checkbox" name="link_options" value="1" <?php checked( $settings['link_options'] ); ?>> <?php esc_html_e( 'Use the password, bot blocking, WeChat help and rotating destinations you set on a link', 'redirhub-redirects' ); ?></label>
+					<p class="description"><?php esc_html_e( 'Off: such links simply redirect to their main destination.', 'redirhub-redirects' ); ?></p></td>
 				</tr>
 				<tr>
 					<th scope="row"><?php esc_html_e( 'Visitor address', 'redirhub-redirects' ); ?></th>

@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       RedirHub Redirects
  * Plugin URI:        https://github.com/redirhub/wordpress-redirects
- * Description:       Serves the redirects you manage in RedirHub from this WordPress site, without moving your DNS: short links, migrations and catch-alls, with click analytics.
+ * Description:       Send every old, moved or mistyped link to the right page: keep your search rankings, run short links on your own domain and see every click. No server or DNS changes.
  * Version:           1.0.0
  * Requires at least: 5.9
  * Requires PHP:      7.4

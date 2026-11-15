@@ -53,8 +53,8 @@ final class SelfTest {
 		$results[] = null === $redirect
 			? array(
 				'ok'     => true,
-				'title'  => __( 'No exact redirect to test', 'redirhub-redirects' ),
-				'detail' => __( 'The rules of this domain hold no plain redirect yet.', 'redirhub-redirects' ),
+				'title'  => __( 'Nothing to test yet', 'redirhub-redirects' ),
+				'detail' => __( 'Add a redirect for this domain in RedirHub, then run the test again.', 'redirhub-redirects' ),
 			)
 			: self::redirect( $rules, $host, $redirect );
 
@@ -86,7 +86,7 @@ final class SelfTest {
 	private static function check_path( RuleSet $rules, string $host ): array {
 		$url      = self::scheme() . '://' . $host . $rules->check_path();
 		$response = self::request( 'GET', $url );
-		$title    = __( 'RedirHub can check this site', 'redirhub-redirects' );
+		$title    = __( 'Your domain can be verified', 'redirhub-redirects' );
 		if ( is_wp_error( $response ) ) {
 			return self::unreachable( $title, $url, $response );
 		}
@@ -98,7 +98,7 @@ final class SelfTest {
 				'ok'     => true,
 				'title'  => $title,
 				/* translators: %s: a URL. */
-				'detail' => sprintf( __( '%s answers with this site’s token and the current rules.', 'redirhub-redirects' ), $url ),
+				'detail' => sprintf( __( 'RedirHub reaches this site at %s and sees your latest redirects.', 'redirhub-redirects' ), $url ),
 			);
 		}
 		if ( 200 === $code && 0 === strpos( $body, 'token=' . $rules->token( $host ) . ' ' ) ) {
@@ -130,7 +130,7 @@ final class SelfTest {
 		$url      = self::scheme() . '://' . $host . Path::escape( $path );
 		$response = self::request( 'HEAD', $url );
 		/* translators: %s: a path such as /old-page. */
-		$title = sprintf( __( 'Redirects work (%s)', 'redirhub-redirects' ), $path );
+		$title = sprintf( __( 'Your redirects work (%s)', 'redirhub-redirects' ), $path );
 		if ( is_wp_error( $response ) ) {
 			return self::unreachable( $title, $url, $response );
 		}
@@ -147,7 +147,7 @@ final class SelfTest {
 				'ok'     => true,
 				'title'  => $title,
 				/* translators: 1: an HTTP status code, 2: a URL. */
-				'detail' => sprintf( __( 'Answered %1$d to %2$s.', 'redirhub-redirects' ), $code, $location ),
+				'detail' => sprintf( __( 'A visitor is sent on to %2$s (%1$d).', 'redirhub-redirects' ), $code, $location ),
 			);
 		}
 		if ( 200 === $code ) {

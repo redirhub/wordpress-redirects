@@ -46,24 +46,24 @@ final class SiteHealth {
 		$level  = Status::level();
 		$state  = State::get();
 		$result = array(
-			'label'       => __( 'RedirHub redirects are served with the latest rules', 'redirhub-redirects' ),
+			'label'       => __( 'Your redirects are up to date', 'redirhub-redirects' ),
 			'status'      => 'good',
 			'badge'       => array(
 				'label' => __( 'Redirects', 'redirhub-redirects' ),
 				'color' => 'blue',
 			),
-			'description' => '<p>' . esc_html__( 'This site downloads its redirect rules from RedirHub and serves them.', 'redirhub-redirects' ) . '</p>',
+			'description' => '<p>' . esc_html__( 'Old and short links on this site land where you set them in RedirHub.', 'redirhub-redirects' ) . '</p>',
 			'actions'     => '<p><a href="' . esc_url( Page::url() ) . '">' . esc_html__( 'Open RedirHub Redirects', 'redirhub-redirects' ) . '</a></p>',
 			'test'        => 'redirhub_redirects',
 		);
 		if ( Status::FAILING === $level || Status::STALE === $level ) {
 			$result['status']      = 'critical';
-			$result['label']       = Status::FAILING === $level ? __( 'RedirHub redirects cannot be downloaded', 'redirhub-redirects' ) : __( 'RedirHub redirects are out of date', 'redirhub-redirects' );
+			$result['label']       = Status::FAILING === $level ? __( 'Your redirects can’t be updated', 'redirhub-redirects' ) : __( 'Your redirects may be out of date', 'redirhub-redirects' );
 			$result['description'] = '<p>' . esc_html( Status::error_text( (string) $state['error'] ) ) . '</p>';
 		} elseif ( Status::WAITING === $level ) {
 			$result['status']      = 'recommended';
-			$result['label']       = __( 'RedirHub has not checked this site yet', 'redirhub-redirects' );
-			$result['description'] = '<p>' . esc_html__( 'Press “Check now” on the domain in the RedirHub dashboard to finish connecting it.', 'redirhub-redirects' ) . '</p>';
+			$result['label']       = __( 'Your domain is not verified yet', 'redirhub-redirects' );
+			$result['description'] = '<p>' . esc_html__( 'Press “Check now” on your domain in the RedirHub dashboard to finish connecting it.', 'redirhub-redirects' ) . '</p>';
 		}
 
 		return $result;

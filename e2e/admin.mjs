@@ -38,7 +38,8 @@ page.on('pageerror', (e) => errors.push(e.message));
 const shot = (name, full = true) => page.screenshot({ path: join(shots, `${name}.png`), fullPage: full });
 // The WordPress.org screenshots (copied to .wordpress-org/ by bin/wporg-assets.mjs): no core update nag.
 const listing = async (name, target = page) => {
-  await page.addStyleTag({ content: '.update-nag,#wp-admin-bar-updates{display:none!important}' });
+  // Nor the test site's own notes (it has no HTTPS), which a real site would not show.
+  await page.addStyleTag({ content: '.update-nag,#wp-admin-bar-updates,.rh-notes{display:none!important}' });
   await target.screenshot({ path: join(shots, `wporg-${name}.png`) });
 };
 
@@ -70,7 +71,7 @@ await page.fill('#rh-rules-url', '## Values\n- Hostname: `promo.example.test`\n-
 await page.fill('#rh-key', 'e2eIntegrationKey0123456789');
 await page.click('.rh-connect button[type=submit]');
 await page.waitForLoadState();
-check('connected: the rules are counted', (await page.locator('.notice-success').innerText()).includes('8 rules for promo.example.test, shop.example.test'));
+check('connected: the rules are counted', (await page.locator('.notice-success').innerText()).includes('8 redirects for promo.example.test, shop.example.test are live'));
 check('status: waiting for RedirHub’s check', (await page.locator('.rh-pill').getAttribute('data-status')) === 'waiting');
 check('the rules card shows 8', (await page.locator('[data-rules-count]').getAttribute('data-rules-count')) === '8');
 await shot('3-connected-waiting');
@@ -81,7 +82,7 @@ console.log('\nRedirHub checks the site');
 execFileSync('curl', ['-s', '-H', 'Host: promo.example.test', 'http://127.0.0.1/_redirhub/check']);
 await page.reload();
 check('status: connected once the check path answered', (await page.locator('.rh-pill').getAttribute('data-status')) === 'ok');
-check('the check card names the hostname', (await page.locator('.rh-card', { hasText: 'RedirHub’s check' }).innerText()).includes('promo.example.test'));
+check('the check card names the hostname', (await page.locator('[data-card=check]').innerText()).includes('promo.example.test'));
 
 console.log('\nTest');
 await page.click('form:has(input[value=redirhub_test]) button');
@@ -120,17 +121,17 @@ console.log('\nDownloads failing');
 await post('/control/status?code=503');
 await page.click('form:has(input[value=redirhub_sync]) button');
 await page.waitForLoadState();
-check('Sync now reports the failure in words', (await page.locator('.notice-error').innerText()).includes('status 503'));
-check('the rules card says the last good copy stays in use', (await page.locator('.rh-card', { hasText: 'Rules' }).first().innerText()).includes('last good copy stays in use'));
+check('Sync now reports the failure in words', (await page.locator('.notice-error').innerText()).includes('an error (503)'));
+check('the redirects card says they keep working with the last good copy', (await page.locator('[data-card=rules]').innerText()).includes('keep working with the last good copy'));
 await shot('5-sync-failing', false);
 // Long enough ago to count as stopped: every admin screen warns.
 wp('\\RedirHub\\Redirects\\State::update(["fetched_at"=>time()-3600]);');
 await page.goto(`${site}/wp-admin/index.php`);
-check('when sync has stopped, every admin screen warns', await page.locator('.notice-error', { hasText: 'RedirHub Redirects cannot download the rules' }).count() === 1);
+check('when sync has stopped, every admin screen warns', await page.locator('.notice-error', { hasText: 'Your redirects can’t be updated' }).count() === 1);
 await page.goto(`${site}/wp-admin/site-health.php`);
 await page.waitForSelector('.health-check-accordion-trigger', { timeout: 30000 });
 await page.waitForTimeout(3000);
-check('Site Health shows it as critical', (await page.locator('.site-health-issues-wrapper').first().innerText()).includes('RedirHub redirects are out of date'));
+check('Site Health shows it as critical', (await page.locator('.site-health-issues-wrapper').first().innerText()).includes('Your redirects may be out of date'));
 await post('/control/status?code=0');
 await page.goto(page_);
 await page.click('form:has(input[value=redirhub_sync]) button');

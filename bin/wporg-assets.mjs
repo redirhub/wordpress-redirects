@@ -38,7 +38,7 @@ const banner = (scale) => `<!doctype html><html><head><meta charset="utf-8"><sty
   <div class="mark">${mark(150)}</div>
   <div>
     <h1>RedirHub Redirects</h1>
-    <p>Your RedirHub redirects, served by WordPress.<br>No DNS change, every click counted.</p>
+    <p>Every old link lands on the right page.<br>Keep your rankings, see every click.</p>
     <div class="route"><span class="chip">/old-page</span><span class="seg"></span><span class="node"><svg viewBox="0 0 24 24"><path d="M5 12h12"/><path d="M12 6l6 6-6 6"/></svg></span><span class="seg"></span><span class="chip">/new-page</span></div>
   </div>
 </div></body></html>`;
