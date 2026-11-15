@@ -68,6 +68,7 @@ check('connected: the rules are counted', (await page.locator('.notice-success')
 check('status: waiting for RedirHub’s check', (await page.locator('.rh-pill').getAttribute('data-status')) === 'waiting');
 check('the rules card shows 8', (await page.locator('[data-rules-count]').getAttribute('data-rules-count')) === '8');
 await shot('3-connected-waiting');
+check('the Change form never prints the saved rules address', (await page.inputValue('#rh-rules-url')) === '' && !(await page.content()).includes('value="http://mock:8080/rules/site.txt"'));
 
 console.log('\nRedirHub checks the site');
 // As RedirHub does (Node's fetch drops a Host header, so curl).

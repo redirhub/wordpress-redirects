@@ -101,7 +101,9 @@ final class Page {
 	public static function handle_connect(): void {
 		self::verify( 'connect' );
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified above.
-		$url = Settings::rules_url_is_constant() ? Settings::rules_url() : self::extract_url( sanitize_textarea_field( wp_unslash( (string) ( $_POST['rules_url'] ?? '' ) ) ) );
+		$pasted = sanitize_textarea_field( wp_unslash( (string) ( $_POST['rules_url'] ?? '' ) ) );
+		// Changing only the key: an empty address keeps the saved one.
+		$url = Settings::rules_url_is_constant() || ( '' === trim( $pasted ) && '' !== Settings::rules_url() ) ? Settings::rules_url() : self::extract_url( $pasted );
 		$key = Settings::key_is_constant() ? '' : trim( sanitize_text_field( wp_unslash( (string) ( $_POST['key'] ?? '' ) ) ) );
 		// phpcs:enable
 
@@ -373,9 +375,11 @@ final class Page {
 	/**
 	 * The two fields of the connection.
 	 *
-	 * @param string $rules_url The address to fill in.
+	 * @param string $rules_url The address to fill in (only one entered before a failed try: the
+	 *                          saved address is a credential and never printed whole).
+	 * @param bool   $change    Changing a saved connection: both fields may stay empty.
 	 */
-	private static function connection_fields( string $rules_url ): void {
+	private static function connection_fields( string $rules_url, bool $change = false ): void {
 		?>
 		<p>
 			<label for="rh-rules-url"><strong><?php esc_html_e( 'Rules address', 'redirhub-redirects' ); ?></strong></label><br>
@@ -383,8 +387,8 @@ final class Page {
 				<input type="text" id="rh-rules-url" class="large-text code" value="<?php echo esc_attr( self::mask_url( Settings::rules_url() ) ); ?>" readonly>
 				<span class="description"><?php esc_html_e( 'Set in wp-config.php (REDIRHUB_RULES_URL).', 'redirhub-redirects' ); ?></span>
 			<?php else : ?>
-				<input type="text" inputmode="url" id="rh-rules-url" name="rules_url" class="large-text code" required placeholder="https://…/….txt" value="<?php echo esc_attr( $rules_url ); ?>" autocomplete="off" spellcheck="false">
-				<span class="description"><?php esc_html_e( 'You can also paste the whole setup text: the address is picked out of it.', 'redirhub-redirects' ); ?></span>
+				<input type="text" inputmode="url" id="rh-rules-url" name="rules_url" class="large-text code" <?php echo $change ? '' : 'required'; ?> placeholder="<?php echo esc_attr( $change ? self::mask_url( Settings::rules_url() ) : 'https://…/….txt' ); ?>" value="<?php echo esc_attr( $rules_url ); ?>" autocomplete="off" spellcheck="false">
+				<span class="description"><?php echo $change ? esc_html__( 'Leave empty to keep the address you saved. You can also paste the whole setup text: the address is picked out of it.', 'redirhub-redirects' ) : esc_html__( 'You can also paste the whole setup text: the address is picked out of it.', 'redirhub-redirects' ); ?></span>
 			<?php endif; ?>
 		</p>
 		<p>
@@ -525,6 +529,10 @@ final class Page {
 		}
 		if ( 'https' !== wp_parse_url( home_url(), PHP_URL_SCHEME ) ) {
 			$notes[] = array( 'warning', __( 'This site’s address starts with http://. RedirHub checks the site over HTTPS, so the domain needs a certificate.', 'redirhub-redirects' ) );
+		}
+		$server = wp_unslash( $_SERVER ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- only tested for presence.
+		if ( 'remote_addr' === Settings::all()['ip_source'] && ( isset( $server['HTTP_CF_CONNECTING_IP'] ) || isset( $server['HTTP_X_FORWARDED_FOR'] ) || isset( $server['HTTP_X_REAL_IP'] ) ) ) {
+			$notes[] = array( 'warning', __( 'A proxy or CDN stands in front of this site, but visitor addresses are taken from the connection, which is the proxy’s. Every visitor then shares one address: in analytics, and for the limit on password attempts. Choose the proxy’s header under Settings below.', 'redirhub-redirects' ) );
 		}
 		$caches = Compat::detected();
 		if ( array() !== $caches ) {
@@ -778,7 +786,7 @@ final class Page {
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 					<input type="hidden" name="action" value="redirhub_connect">
 					<?php wp_nonce_field( 'redirhub_connect' ); ?>
-					<?php self::connection_fields( '' === $rules_url ? Settings::rules_url() : $rules_url ); ?>
+					<?php self::connection_fields( $rules_url, true ); ?>
 					<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Save and download', 'redirhub-redirects' ); ?></button></p>
 				</form>
 			</details>

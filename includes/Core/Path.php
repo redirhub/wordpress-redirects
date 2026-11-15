@@ -63,8 +63,22 @@ final class Path {
 		if ( 0 === strpos( $etag, 'W/' ) ) {
 			$etag = substr( $etag, 2 );
 		}
+		$etag = trim( $etag, '"' );
 
-		return trim( $etag, '"' );
+		// An entity tag is visible ASCII (RFC 9110); anything else is no ETag at all.
+		return preg_match( '/^[\x21\x23-\x7e]*$/', $etag ) ? $etag : '';
+	}
+
+	/**
+	 * An ETag header as received, fit to send back in `If-None-Match`: printable ASCII only,
+	 * else empty.
+	 *
+	 * @param string $header The `ETag` header.
+	 */
+	public static function etag_header( string $header ): string {
+		$header = trim( $header );
+
+		return preg_match( '/^[\x20-\x7e]*$/', $header ) ? $header : '';
 	}
 
 	/**

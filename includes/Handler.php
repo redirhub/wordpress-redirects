@@ -91,7 +91,8 @@ final class Handler {
 					return;
 				}
 			}
-			if ( null !== $rules->catch_all( $host ) ) {
+			$catch_all = $rules->catch_all( $host );
+			if ( null !== $catch_all && ( $request->is_answerable() || ( 'POST' === $request->method && Settings::link_options() && '' !== $catch_all->option( 'password' ) ) ) ) {
 				add_action( 'template_redirect', array( self::class, 'catch_all' ), PHP_INT_MAX );
 			}
 			if ( $router->reports_404( $request ) ) {
@@ -111,6 +112,12 @@ final class Handler {
 		}
 		try {
 			$answer = self::$router->after_404( self::$request );
+			if ( null === $answer && 'POST' === self::$request->method ) {
+				// The password form of a protected catch-all.
+				$host   = (string) self::$router->host( self::$request );
+				$rule   = self::$router->rules()->catch_all( $host );
+				$answer = null === $rule ? null : self::$router->answer( $host, $rule, self::$request );
+			}
 			if ( null !== $answer ) {
 				self::serve( $answer );
 			}
@@ -248,7 +255,7 @@ final class Handler {
 					)
 				);
 				// Post/Redirect/Get: the same address, now unlocked.
-				self::send( 303, array( 'Location' => $path . ( '' === $request->query ? '' : '?' . $request->query ) ) + $private, '' );
+				self::send( 303, array( 'Location' => '/' . ltrim( $path, '/' ) . ( '' === $request->query ? '' : '?' . $request->query ) ) + $private, '' );
 			}
 			$error = 'pw.wrong';
 		}
@@ -306,15 +313,19 @@ final class Handler {
 	 * @param string                $body    The body (not sent for HEAD).
 	 */
 	private static function send( int $status, array $headers, string $body ): void {
+		if ( headers_sent() ) {
+			// Too late to answer (something printed already): fail open, the site goes on.
+			Log::warn( 'headers', 'output started before the plugin could answer; the site answered instead' );
+
+			return;
+		}
 		self::$answered = true;
 		Compat::do_not_cache();
-		if ( ! headers_sent() ) {
-			status_header( $status );
-			foreach ( $headers as $name => $value ) {
-				header( $name . ': ' . str_replace( array( "\r", "\n" ), '', $value ) );
-			}
-			header( 'Content-Length: ' . strlen( $body ) );
+		status_header( $status );
+		foreach ( $headers as $name => $value ) {
+			header( $name . ': ' . str_replace( array( "\r", "\n" ), '', $value ) );
 		}
+		header( 'Content-Length: ' . strlen( $body ) );
 		if ( 'HEAD' !== self::$request->method ) {
 			echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- a text body or a page escaped where it is built.
 		}

@@ -89,13 +89,14 @@ final class Sync {
 		if ( '' === $url ) {
 			return self::result( 'off' );
 		}
-		if ( ! self::lock( $force ) ) {
+		$token = self::lock( $force );
+		if ( null === $token ) {
 			return self::result( 'busy' );
 		}
 		try {
 			return self::download( $url );
 		} finally {
-			delete_option( self::LOCK );
+			self::unlock( $token );
 		}
 	}
 
@@ -106,6 +107,11 @@ final class Sync {
 	 * @return array{status: string, error: string, changed: bool}
 	 */
 	private static function download( string $url ): array {
+		// Another process may have downloaded since this request loaded its options.
+		wp_cache_delete( 'alloptions', 'options' );
+		foreach ( array( State::OPTION, Store::OPTION ) as $option ) {
+			wp_cache_delete( $option, 'options' );
+		}
 		State::flush();
 		Store::flush();
 		$state    = State::get();
@@ -124,7 +130,7 @@ final class Sync {
 				'headers'             => $headers,
 				'user-agent'          => Plugin::user_agent(),
 				'limit_response_size' => self::MAX_BYTES + 1,
-				'reject_unsafe_urls'  => false,
+				'reject_unsafe_urls'  => self::reject_unsafe_urls(),
 			)
 		);
 
@@ -144,7 +150,7 @@ final class Sync {
 		if ( strlen( $body ) > self::MAX_BYTES ) {
 			return self::fail( 'size', (string) strlen( $body ) );
 		}
-		$etag = (string) wp_remote_retrieve_header( $response, 'etag' );
+		$etag = Path::etag_header( (string) wp_remote_retrieve_header( $response, 'etag' ) );
 		try {
 			$rules = Parser::parse( $body, $etag );
 		} catch ( UnknownFormat $error ) {
@@ -161,17 +167,61 @@ final class Sync {
 			) + self::success_fields( $rules )
 		);
 		if ( $changed ) {
-			Compat::purge( self::changed_urls( $previous, $rules ) );
-			/**
-			 * Fires after a new copy of the rules was downloaded.
-			 *
-			 * @param RuleSet      $rules    The new copy.
-			 * @param RuleSet|null $previous The copy it replaced, or null for the first.
-			 */
-			do_action( 'redirhub_redirects_rules_updated', $rules, $previous );
+			self::after_change( self::changed_urls( $previous, $rules ) );
 		}
 
 		return self::result( 'updated', '', $changed );
+	}
+
+	/**
+	 * Purges the pages a change may hide, now when every plugin has loaded, else on the next
+	 * request that loads them all (purge_pending()): a request the plugin answered while loading
+	 * never loads the cache plugins that come after it.
+	 *
+	 * @param list<string>|null $urls The addresses; null for the whole cache.
+	 */
+	private static function after_change( ?array $urls ): void {
+		if ( did_action( 'plugins_loaded' ) ) {
+			self::purge( $urls );
+
+			return;
+		}
+		$pending = State::get()['purge'];
+		if ( null === $urls || 'all' === $pending ) {
+			$merged = null;
+		} else {
+			$merged = array_values( array_unique( array_merge( is_array( $pending ) ? $pending : array(), $urls ) ) );
+			if ( count( $merged ) > self::PURGE_LIMIT ) {
+				$merged = null;
+			}
+		}
+		State::update( array( 'purge' => null === $merged ? 'all' : $merged ) );
+	}
+
+	/** `wp_loaded`: carries out a purge a download left for a request with every plugin loaded. */
+	public static function purge_pending(): void {
+		$pending = State::get()['purge'];
+		if ( false === $pending ) {
+			return;
+		}
+		State::update( array( 'purge' => false ) );
+		self::purge( 'all' === $pending ? null : (array) $pending );
+	}
+
+	/**
+	 * Asks the page caches to forget the pages, and tells whoever listens.
+	 *
+	 * @param list<string>|null $urls The addresses; null for the whole cache.
+	 */
+	private static function purge( ?array $urls ): void {
+		Compat::purge( $urls );
+		/**
+		 * Fires after the rules changed and the page caches were asked to forget the pages the
+		 * change concerns.
+		 *
+		 * @param RuleSet|null $rules The copy in use.
+		 */
+		do_action( 'redirhub_redirects_rules_updated', Store::load() );
 	}
 
 	/**
@@ -234,35 +284,59 @@ final class Sync {
 	}
 
 	/**
-	 * Takes the download lock: an option row only one process can add.
+	 * Takes the download lock: a row only one process can insert (`INSERT IGNORE` on the unique
+	 * option name), holding a token so only its owner removes it. A lock older than LOCK_TTL
+	 * belongs to a process that died and is replaced in one statement.
 	 *
 	 * @param bool $wait Wait up to six seconds for a download that is running.
+	 * @return string|null The token, or null when another process holds the lock.
 	 */
-	private static function lock( bool $wait ): bool {
+	private static function lock( bool $wait ): ?string {
+		global $wpdb;
+		$token    = time() . ':' . bin2hex( random_bytes( 8 ) );
 		$deadline = time() + ( $wait ? 6 : 0 );
 		do {
-			if ( add_option( self::LOCK, time(), '', false ) ) {
-				return true;
-			}
-			$held = (int) get_option( self::LOCK, 0 );
-			if ( time() - $held > self::LOCK_TTL ) {
-				delete_option( self::LOCK );
-				continue;
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery -- an atomic lock; the options API checks, then inserts.
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND CAST(SUBSTRING_INDEX(option_value, ':', 1) AS UNSIGNED) < %d", self::LOCK, time() - self::LOCK_TTL ) );
+			$taken = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')", self::LOCK, $token ) );
+			// phpcs:enable
+			if ( 1 === $taken ) {
+				wp_cache_delete( self::LOCK, 'options' );
+				wp_cache_delete( 'notoptions', 'options' );
+
+				return $token;
 			}
 			if ( $wait ) {
 				usleep( 250000 );
-				wp_cache_delete( self::LOCK, 'options' );
-				wp_cache_delete( 'notoptions', 'options' );
 			}
 		} while ( time() < $deadline );
 
-		return false;
+		return null;
+	}
+
+	/**
+	 * Releases the lock, if this process still holds it.
+	 *
+	 * @param string $token The token lock() returned.
+	 */
+	private static function unlock( string $token ): void {
+		global $wpdb;
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", self::LOCK, $token ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		wp_cache_delete( self::LOCK, 'options' );
+	}
+
+	/**
+	 * Whether a URL the plugin requests must be a public one. A local or development site may
+	 * use a private address (e.g. a test stand-in for RedirHub).
+	 */
+	public static function reject_unsafe_urls(): bool {
+		return ! in_array( wp_get_environment_type(), array( 'local', 'development' ), true );
 	}
 
 	/**
 	 * The addresses whose cached pages may now hide a redirect: the paths of exact rules that are
-	 * new or changed, on each listed hostname. Null asks for the whole cache: the first copy, or
-	 * more than PURGE_LIMIT paths.
+	 * new or changed, on each listed hostname. Null asks for the whole cache: the first copy, a
+	 * changed catch-all or list of hostnames, or more than PURGE_LIMIT paths.
 	 *
 	 * @param RuleSet|null $previous The copy before.
 	 * @param RuleSet      $rules    The new copy.
@@ -274,7 +348,15 @@ final class Sync {
 		}
 		$urls   = array();
 		$before = $previous->to_array()['hosts'];
-		foreach ( $rules->to_array()['hosts'] as $host => $entry ) {
+		$after  = $rules->to_array()['hosts'];
+		if ( array_keys( $before ) !== array_keys( $after ) ) {
+			return null;
+		}
+		foreach ( $after as $host => $entry ) {
+			// A new or changed catch-all applies to every page the site cannot find, which a cache may hold.
+			if ( $before[ $host ]['all'] !== $entry['all'] ) {
+				return null;
+			}
 			foreach ( $entry['exact'] as $path => $rule ) {
 				if ( ( $before[ $host ]['exact'][ $path ] ?? null ) === $rule ) {
 					continue;

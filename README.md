@@ -46,7 +46,10 @@ WordPress.org listing.
   does: the password form (the edge's unlock cookie and attempt limit), `nobot`, `nowechat`, and
   further destinations (`routing=order` in turn, otherwise at random). They can be switched off.
 - **Page caches.** Answers set `DONOTCACHEPAGE`; when the rules change, the pages of the changed
-  paths are purged in the cache plugins it knows (all pages for the first copy).
+  paths are purged in the cache plugins it knows (all pages for the first copy, a changed
+  catch-all or list of hostnames). A download that follows one of the plugin's early answers
+  leaves the purge to the next request that loads every plugin, since the cache plugins load
+  after it.
 - **Admin.** Tools → RedirHub: connect (pasting the whole setup text works too), status, RedirHub's
   last check, analytics, a self-test over HTTP, the rules in use, settings, disconnect. Site Health
   test and info, an admin notice when downloads keep failing.

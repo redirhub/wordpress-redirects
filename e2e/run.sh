@@ -35,7 +35,7 @@ echo; echo "== scenarios"; php scenarios.php || status=1
 if node -e "require('playwright')" 2>/dev/null; then
   echo; echo "== admin page in a browser"; node admin.mjs "$shots" || status=1
 fi
-log="$(docker compose exec -T wordpress sh -c 'cat wp-content/debug.log 2>/dev/null' | grep -i redirhub || true)"
+log="$( { docker compose exec -T wordpress sh -c 'cat wp-content/debug.log 2>/dev/null'; docker compose logs --no-log-prefix wordpress 2>&1; } | grep -E 'PHP (Warning|Notice|Deprecated|Fatal|Parse)' | grep -i redirhub || true)"
 if [ -n "$log" ]; then echo; echo "== PHP notices from the plugin"; echo "$log"; status=1; fi
 
 [ "$keep" = 1 ] || docker compose down -v >/dev/null

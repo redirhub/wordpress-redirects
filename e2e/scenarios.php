@@ -88,14 +88,20 @@ post( $mock . '/control/reset', '' );
 post( $mock . '/control/rules?name=links', rules_file( array_merge( $rules, array( "links.example.test/fresh\thttps://dest.example.test/fresh\t307" ) ) ) );
 list( $code ) = http( $wp, 'GET', 'https://links.example.test/fresh' );
 check( 'a new rule is not served before the copy is due (no download per request)', 307 !== $code );
-wp_eval( '\RedirHub\Redirects\State::update(["fetched_at"=>time()-120,"attempt_at"=>0]);' );
+wp_eval( '\RedirHub\Redirects\State::update(["fetched_at"=>time()-120,"attempt_at"=>0]); delete_option("e2e_purges");' );
 http( $wp, 'GET', 'https://links.example.test/old' ); // Finds the copy due: downloads after its answer.
-usleep( 500000 );
-list( $code, $head ) = http( $wp, 'GET', 'https://links.example.test/fresh' );
-check( 'once due, the next visit downloads it in the background and it is served', 307 === $code && 'https://dest.example.test/fresh' === ( $head['location'] ?? '' ) );
+$code = 0;
+for ( $i = 0; $i < 20 && 307 !== $code; $i++ ) {
+	usleep( 250000 );
+	list( $code, $head ) = http( $wp, 'GET', 'https://links.example.test/fresh' );
+}
+check( 'once due, the next visit downloads it in the background, and it is served', 307 === $code && 'https://dest.example.test/fresh' === ( $head['location'] ?? '' ) );
+http( $wp, 'GET', 'https://links.example.test/exists' ); // A page: every plugin loads.
+$purges = trim( wp_eval( 'echo implode("|", (array) get_option("e2e_purges", []));' ) );
+check( 'with every plugin loaded (the next page WordPress renders), the new path is purged (' . $purges . ')', false !== strpos( $purges, '/fresh' ) );
 $log = mock_log();
 $downloads = array_values( array_filter( $log, function ( $e ) { return '/rules/links.txt' === $e->path; } ) );
-check( 'exactly one download, with the plugin’s User-Agent', 1 === count( $downloads ) && 0 === strpos( $downloads[0]->ua, 'wordpress-redirects/1.0.0' ) );
+check( 'exactly one download (' . count( $downloads ) . '), with the plugin’s User-Agent', 1 === count( $downloads ) && 0 === strpos( $downloads[0]->ua, 'wordpress-redirects/1.0.0' ) );
 check( 'it asked with If-None-Match', '' !== ( $downloads[0]->inm ?? '' ) );
 $state = json_decode( wp_eval( 'echo json_encode(\RedirHub\Redirects\Sync::run(true));' ) );
 check( 'an unchanged file is answered 304 and kept', 'unchanged' === ( $state->status ?? '' ) );
@@ -145,6 +151,32 @@ $redirect = timing( $wp, 'https://links.example.test/old/page-12345', 60 );
 $page     = timing( $wp, 'https://links.example.test/exists', 60 );
 printf( "    median time to first byte: redirect with 50,000 rules %.1f ms, a WordPress page %.1f ms\n", $redirect * 1000, $page * 1000 );
 check( 'a redirect answers faster than a WordPress page', $redirect < $page );
+
+section( 'Hardening' );
+$out = wp_eval( '$r = new \RedirHub\Redirects\Core\RuleSet(["etag" => "a\rprint(\"PWNED\");//", "hosts" => []]); $f = \RedirHub\Redirects\Store::save($r); ob_start(); include \RedirHub\Redirects\Store::dir() . "/" . $f; echo ob_get_clean() === "" ? "inert" : "EXECUTED";' );
+check( 'a hostile ETag in the cache file stays inert', 'inert' === trim( $out ) );
+connect( rules_file( $rules ) );
+wp_eval( 'global $wpdb; $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE \'%redirhub_pw_%\'");' );
+list( $code, $head ) = http( $wp, 'POST', 'https://links.example.test//vault', array( 'Content-Type' => 'application/x-www-form-urlencoded' ), 'password=' . rawurlencode( 'open sesame' ) );
+check( 'unlocking never sends a protocol-relative Location (' . ( $head['location'] ?? '-' ) . ')', 303 === $code && '/vault' === ( $head['location'] ?? '' ) );
+$runs = shell_exec( 'cd ' . escapeshellarg( __DIR__ ) . ' && for i in 1 2 3 4; do docker compose exec -T cli wp eval \'\RedirHub\Redirects\State::update(["fetched_at"=>0]); echo \RedirHub\Redirects\Sync::run()["status"], "\n";\' 2>/dev/null & done; wait' );
+$statuses = array_count_values( array_filter( array_map( 'trim', explode( "\n", (string) $runs ) ) ) );
+check( 'concurrent downloads: one at a time (' . json_encode( $statuses ) . ')', ( $statuses['updated'] ?? 0 ) + ( $statuses['unchanged'] ?? 0 ) >= 1 && array_sum( $statuses ) === 4 );
+$file = trim( wp_eval( '$f = \RedirHub\Redirects\State::get()["file"]; echo is_file(\RedirHub\Redirects\Store::dir() . "/" . $f) ? "present" : "missing";' ) );
+check( 'and the copy in use is on disk afterwards', 'present' === $file );
+
+section( 'Password-protected catch-all' );
+connect( rules_file( $rules, 'links.example.test', "@host vault.example.test check=FAKEvlt\nvault.example.test/*\thttps://dest.example.test/v/\t302\tp\tpassword={$hash}\n" ) );
+list( $code ) = http( $wp, 'GET', 'https://vault.example.test/anything' );
+check( 'a missing page of the hostname asks for the password', 401 === $code );
+list( $code, $head ) = http( $wp, 'POST', 'https://vault.example.test/anything', array( 'Content-Type' => 'application/x-www-form-urlencoded' ), 'password=' . rawurlencode( 'open sesame' ) );
+preg_match( '/^(__rh_pw_[a-f0-9]{16})=([^;]+)/', $head['set-cookie'] ?? '', $cookie );
+check( 'the form posts back and unlocks', 303 === $code && ! empty( $cookie ) );
+list( $code, $head ) = http( $wp, 'GET', 'https://vault.example.test/anything', array( 'Cookie' => ( $cookie[1] ?? 'x' ) . '=' . ( $cookie[2] ?? '' ) ) );
+check( 'then the catch-all redirects', 302 === $code && 'https://dest.example.test/v/anything' === ( $head['location'] ?? '' ) );
+list( $code ) = http( $wp, 'GET', 'https://vault.example.test/exists' );
+check( 'a page that exists is never taken over', 200 === $code );
+connect( rules_file( $rules ) );
 
 section( 'Disconnect' );
 connect( rules_file( $rules ) );

@@ -26,6 +26,7 @@ final class Plugin {
 		add_action( self::HOURLY, array( self::class, 'cron_sync' ) );
 		add_action( Reporter::HOOK, array( Reporter::class, 'send_queue' ) );
 		add_action( 'init', array( self::class, 'init' ) );
+		add_action( 'wp_loaded', array( Sync::class, 'purge_pending' ) );
 
 		if ( is_admin() ) {
 			Admin\Page::boot();
@@ -73,8 +74,27 @@ final class Plugin {
 		}
 	}
 
-	/** Deactivation: stops the events; settings and the copy stay for a reactivation. */
-	public static function deactivate(): void {
+	/**
+	 * Deactivation: stops the events (on every site, when deactivated for the network); settings
+	 * and the copy stay for a reactivation.
+	 *
+	 * @param bool $network_wide Whether the plugin is deactivated for the whole network.
+	 */
+	public static function deactivate( $network_wide = false ): void {
+		if ( is_multisite() && $network_wide ) {
+			foreach ( get_sites( array( 'fields' => 'ids', 'number' => 0 ) ) as $site_id ) {
+				switch_to_blog( (int) $site_id );
+				self::stop_events();
+				restore_current_blog();
+			}
+
+			return;
+		}
+		self::stop_events();
+	}
+
+	/** Removes the plugin's events and lock on the current site. */
+	private static function stop_events(): void {
 		wp_clear_scheduled_hook( self::HOURLY );
 		wp_clear_scheduled_hook( Sync::HOOK );
 		wp_clear_scheduled_hook( Reporter::HOOK );

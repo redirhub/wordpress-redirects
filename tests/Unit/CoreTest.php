@@ -202,4 +202,46 @@ final class CoreTest extends TestCase {
 		$this->assertNull( $router->before( Request::from_url( 'POST', 'https://a.test/_redirhub/check' ) ) );
 		$this->assertNull( $router->before( Request::from_url( 'GET', 'https://b.test/_redirhub/check' ) ) );
 	}
+
+	/**
+	 * @return array<string, array{string, string}>
+	 */
+	public static function etags(): array {
+		return array(
+			'quoted'                 => array( '"abc"', 'abc' ),
+			'weak'                   => array( 'W/"abc"', 'abc' ),
+			'a carriage return'      => array( "\"a\"\rsystem(\$_GET['c']);//", '' ),
+			'a line feed'            => array( "\"a\nb\"", '' ),
+			'a NUL'                  => array( "\"a\x00b\"", '' ),
+			'non-ASCII'              => array( "\"caf\xC3\xA9\"", '' ),
+			'a quote inside'         => array( '"a"b"', '' ),
+			'empty'                  => array( '', '' ),
+		);
+	}
+
+	/**
+	 * An ETag that is not visible ASCII is no ETag: it never reaches the check path, the state
+	 * or the cache file.
+	 *
+	 * @dataProvider etags
+	 */
+	public function test_etags_are_visible_ascii_or_nothing( string $header, string $expected ): void {
+		$this->assertSame( $expected, Path::etag( $header ) );
+		$this->assertSame( $expected, Parser::parse( "@host a.test check=T\n", $header )->etag() );
+	}
+
+	public function test_an_etag_header_is_sent_back_only_when_printable(): void {
+		$this->assertSame( 'W/"abc"', Path::etag_header( ' W/"abc" ' ) );
+		$this->assertSame( '', Path::etag_header( "\"a\"\rX-Evil: 1" ) );
+	}
+
+	public function test_hostile_values_stay_inert_in_the_exported_copy(): void {
+		$rules = Parser::parse( "@format 1\n@host a.test check=T'.die('x').'\na.test/x\thttps://b.test/?a='.die('y').'\n" );
+		$php   = '<?php return ' . var_export( $rules->to_array(), true ) . ';';
+		$file  = tempnam( sys_get_temp_dir(), 'rh' );
+		file_put_contents( $file, $php );
+
+		$this->assertSame( $rules->to_array(), include $file );
+		unlink( $file );
+	}
 }

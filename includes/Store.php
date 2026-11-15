@@ -119,7 +119,8 @@ final class Store {
 		$name = 'rules-' . bin2hex( random_bytes( 16 ) ) . '.php';
 		$path = self::dir() . '/' . $name;
 		$tmp  = $path . '.' . getmypid() . '.tmp';
-		$php  = "<?php\n// RedirHub Redirects: the rules in use (ETag " . str_replace( array( "\n", '?>' ), '', $rules->etag() ) . "). Generated, do not edit.\ndefined( 'ABSPATH' ) || exit;\nreturn " . var_export( $rules->to_array(), true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
+		// Nothing downloaded stands outside var_export(), which writes every value as a quoted, escaped literal.
+		$php = "<?php\n// RedirHub Redirects: the rules in use. Generated, do not edit.\ndefined( 'ABSPATH' ) || exit;\nreturn " . var_export( $rules->to_array(), true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 
 		// phpcs:disable WordPress.WP.AlternativeFunctions -- WP_Filesystem may ask for FTP credentials; this is a cache file.
 		if ( false === @file_put_contents( $tmp, $php, LOCK_EX ) || ! @rename( $tmp, $path ) ) {
@@ -164,6 +165,10 @@ final class Store {
 	private static function remove_old( string $keep ): void {
 		foreach ( (array) glob( self::dir() . '/rules-*.php*' ) as $path ) {
 			if ( basename( (string) $path ) !== $keep ) {
+				// Without this an old copy keeps its OPcache memory until PHP restarts.
+				if ( function_exists( 'opcache_invalidate' ) ) {
+					@opcache_invalidate( (string) $path, true ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+				}
 				@unlink( (string) $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
 			}
 		}

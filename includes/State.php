@@ -32,7 +32,10 @@ final class State {
 	/**
 	 * The state.
 	 *
-	 * @return array{file: string, etag: string, fetched_at: int, attempt_at: int, refresh: int, rules: int, hosts: list<string>, error: string, error_at: int, failing_since: int, connected_at: int, changed_at: int}
+	 * `purge`: false, or the purge a download left for a request with every plugin loaded (a list
+	 * of addresses, or `all`).
+	 *
+	 * @return array{file: string, etag: string, fetched_at: int, attempt_at: int, refresh: int, rules: int, hosts: list<string>, error: string, error_at: int, failing_since: int, connected_at: int, changed_at: int, purge: false|string|list<string>}
 	 */
 	public static function get(): array {
 		if ( null === self::$cache ) {
@@ -50,6 +53,7 @@ final class State {
 				'failing_since' => 0,
 				'connected_at'  => 0,
 				'changed_at'    => 0,
+				'purge'         => false,
 			);
 		}
 

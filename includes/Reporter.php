@@ -104,6 +104,12 @@ final class Reporter {
 		if ( '' === $key || '' === $url ) {
 			return;
 		}
+		// The key goes only to an HTTPS address (any address on a local or development site).
+		if ( 0 !== stripos( $url, 'https://' ) && Sync::reject_unsafe_urls() ) {
+			Log::warn( 'report-http', 'reports not sent: the @hits address is not HTTPS' );
+
+			return;
+		}
 		$batch = array();
 		$bytes = 0;
 		foreach ( $lines as $line ) {
@@ -149,7 +155,7 @@ final class Reporter {
 				'headers'            => $headers,
 				'user-agent'         => Plugin::user_agent(),
 				'body'               => $body,
-				'reject_unsafe_urls' => false,
+				'reject_unsafe_urls' => Sync::reject_unsafe_urls(),
 			)
 		);
 		if ( is_wp_error( $response ) ) {

@@ -26,13 +26,6 @@ final class Background {
 	private static $tasks = array();
 
 	/**
-	 * Whether the shutdown hook is registered.
-	 *
-	 * @var bool
-	 */
-	private static $registered = false;
-
-	/**
 	 * Whether this plugin answered with a complete response (the visitor has it all).
 	 *
 	 * @var bool
@@ -47,9 +40,10 @@ final class Background {
 	 */
 	public static function defer( callable $task ): void {
 		self::$tasks[] = $task;
-		if ( ! self::$registered ) {
-			self::$registered = true;
-			register_shutdown_function( array( self::class, 'run' ) );
+		// Last on `shutdown`: after WordPress flushed its output buffers, before it closes the
+		// object cache. WordPress runs `shutdown` on every exit, the plugin's early answers too.
+		if ( false === has_action( 'shutdown', array( self::class, 'run' ) ) ) {
+			add_action( 'shutdown', array( self::class, 'run' ), PHP_INT_MAX );
 		}
 	}
 

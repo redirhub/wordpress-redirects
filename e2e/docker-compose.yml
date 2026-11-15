@@ -26,9 +26,11 @@ services:
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_CONFIG_EXTRA: |
+      # A local site: the plugin may then request the private address of the RedirHub stand-in.
+      # The image defines WP_DEBUG from WORDPRESS_DEBUG; a second define would be ignored.
+      WORDPRESS_DEBUG: "1"
+      WORDPRESS_CONFIG_EXTRA: &config |
         define( 'WP_ENVIRONMENT_TYPE', 'local' );
-        define( 'WP_DEBUG', true );
         define( 'WP_DEBUG_LOG', '/var/www/html/wp-content/debug.log' );
         define( 'WP_DEBUG_DISPLAY', false );
     # The site's own hostnames resolve to itself, so WP-Cron's loopback and the self-test work.
@@ -48,6 +50,9 @@ services:
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
+      # wp-config.php reads these at runtime, so WP-CLI needs the same.
+      WORDPRESS_DEBUG: "1"
+      WORDPRESS_CONFIG_EXTRA: *config
     volumes_from: [wordpress]
     entrypoint: ["sleep", "infinity"]
 
