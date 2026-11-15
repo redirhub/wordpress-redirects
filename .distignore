@@ -18,3 +18,5 @@ vendor
 README.md
 NOTICE
 .wordpress-org
+package.json
+package-lock.json

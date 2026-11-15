@@ -1,0 +1,14 @@
+{
+  "name": "wordpress-redirects",
+  "private": true,
+  "description": "Build tools of the admin page: Tailwind CSS (compiled into assets/admin.css, shipped prebuilt) and the lucide icons it inlines.",
+  "scripts": {
+    "build:css": "tailwindcss -i assets/src/admin.css -o assets/admin.css --minify",
+    "watch:css": "tailwindcss -i assets/src/admin.css -o assets/admin.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "tailwindcss": "^4.1.0",
+    "lucide-static": "^0.460.0"
+  }
+}

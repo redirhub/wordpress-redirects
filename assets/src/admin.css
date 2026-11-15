@@ -1,0 +1,225 @@
+/*
+ * Tools → RedirHub, in the RedirHub dashboard's design: its tokens (redirhub/lviv
+ * src/styles/tailwind.css), the brand colours of the brand guidelines, Inter, lucide icons.
+ *
+ * Built into assets/admin.css by `npm run build:css` and shipped prebuilt. Every utility is
+ * prefixed (`rh:`) and important, and no global reset is included: nothing here touches the
+ * rest of wp-admin, and wp-admin's own element styles cannot override the page.
+ */
+@import "tailwindcss/theme.css" layer(theme) prefix(rh);
+@import "tailwindcss/utilities.css" layer(utilities) prefix(rh) important;
+
+@source "../../includes/Admin";
+@source "../admin.js";
+
+@font-face {
+	font-family: "RH Inter";
+	src: url("../inter-latin.woff2") format("woff2");
+	font-weight: 100 900;
+	font-display: swap;
+}
+
+@theme {
+	--font-sans: "RH Inter", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+	/* The dashboard's semantic tokens. */
+	--color-background: #F9FAFB;
+	--color-foreground: #181D27;
+	--color-card: #ffffff;
+	--color-primary: #337CBD;
+	--color-primary-hover: #1C6DB6;
+	--color-accent: #E8F0F8;
+	--color-accent-foreground: #1C6DB6;
+	--color-secondary: #F2F4F7;
+	--color-secondary-foreground: #344054;
+	--color-muted-foreground: #717680;
+	--color-border: #EAECF0;
+	--color-ring: #1C6DB6;
+	--color-destructive: #F04438;
+
+	/* Brand colours (brand guidelines) and the status palette built on them. */
+	--color-brand-blue: #1C6DB6;
+	--color-brand-teal: #20A795;
+	--color-brand-amber: #E59426;
+	--color-brand-dark: #101828;
+	--color-success: #079455;
+	--color-success-soft: #ECFDF3;
+	--color-success-edge: #ABEFC6;
+	--color-warning: #B26A12;
+	--color-warning-soft: #FEF6EE;
+	--color-warning-edge: #F9DBAF;
+	--color-danger: #D92D20;
+	--color-danger-soft: #FEF3F2;
+	--color-danger-edge: #FECDCA;
+	--color-info-soft: #F3F8FD;
+	--color-info-edge: #D7E6F4;
+
+	--radius-lg: 0.5rem;
+	--radius-xl: 0.7rem;
+	--radius-2xl: 0.9rem;
+	--shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04);
+	--shadow-pop: 0 12px 32px -12px rgba(16, 24, 40, 0.18);
+}
+
+/* The page's own ground, edge to edge in wp-admin's content area. */
+body.tools_page_redirhub-redirects #wpcontent,
+body.tools_page_redirhub-redirects #wpbody-content {
+	background: #F9FAFB;
+}
+body.tools_page_redirhub-redirects #wpbody-content {
+	padding-bottom: 48px;
+}
+body.tools_page_redirhub-redirects #wpfooter {
+	display: none;
+}
+
+/* A scoped reset: what Tailwind's preflight would do, inside the page only. */
+#rh-app {
+	font-family: var(--rh-font-sans);
+	font-size: 14px;
+	line-height: 1.5;
+	color: #181D27;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	margin: 0 0 0 -20px;
+}
+#rh-app *,
+#rh-app ::before,
+#rh-app ::after {
+	box-sizing: border-box;
+}
+#rh-app :where(h1, h2, h3, h4, p, ul, ol, li, figure, fieldset, legend, table) {
+	margin: 0;
+	padding: 0;
+	font-size: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	color: inherit;
+}
+#rh-app :where(ul, ol) {
+	list-style: none;
+}
+#rh-app :where(a) {
+	color: inherit;
+	text-decoration: none;
+	box-shadow: none;
+}
+#rh-app :where(code, kbd, pre) {
+	font-family: var(--rh-font-mono);
+	background: none;
+	padding: 0;
+	margin: 0;
+	font-size: 0.92em;
+}
+#rh-app :where(button, input, select, textarea) {
+	font: inherit;
+	color: inherit;
+	margin: 0;
+}
+#rh-app :where(input[type="text"], input[type="password"], input[type="search"], input[type="url"]) {
+	box-shadow: none;
+	min-height: 0;
+	line-height: 1.4;
+}
+#rh-app :where(input:focus, button:focus, a:focus, summary:focus) {
+	box-shadow: none;
+	outline: none;
+}
+#rh-app :where(input, button, a, summary):focus-visible {
+	outline: 2px solid #1C6DB6;
+	outline-offset: 2px;
+}
+#rh-app :where(table) {
+	border-collapse: collapse;
+}
+#rh-app :where(svg) {
+	display: inline-block;
+	flex: none;
+}
+#rh-app summary {
+	list-style: none;
+}
+#rh-app summary::-webkit-details-marker {
+	display: none;
+}
+
+/* Pieces a utility class cannot express. */
+#rh-app .rh-dash {
+	background-image: linear-gradient(to right, currentColor 50%, transparent 0);
+	background-size: 8px 2px;
+	background-repeat: repeat-x;
+	background-position: center;
+}
+#rh-app .rh-switch {
+	appearance: none;
+	-webkit-appearance: none;
+	position: relative;
+	width: 36px;
+	height: 20px;
+	border-radius: 999px;
+	background: #D0D5DD;
+	border: 0;
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+	flex: none;
+}
+#rh-app .rh-switch::before {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	border-radius: 999px;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+	transition: transform 0.15s ease;
+	margin: 0;
+}
+#rh-app .rh-switch:checked {
+	background: #337CBD;
+}
+#rh-app .rh-switch:checked::before {
+	transform: translateX(16px);
+}
+#rh-app .rh-radio {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 16px;
+	height: 16px;
+	border-radius: 999px;
+	border: 1px solid #D0D5DD;
+	background: #fff;
+	margin: 2px 0 0;
+	flex: none;
+	cursor: pointer;
+}
+#rh-app .rh-radio:checked {
+	border: 5px solid #337CBD;
+}
+#rh-app .rh-radio:checked::before {
+	content: none;
+}
+#rh-app button[aria-busy="true"] {
+	opacity: 0.6;
+	pointer-events: none;
+}
+#rh-app [data-change-form][hidden] {
+	display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+	#rh-app .rh-spin-on-busy[aria-busy="true"] svg {
+		animation: rh-spin 0.8s linear infinite;
+	}
+}
+@keyframes rh-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+@media (max-width: 782px) {
+	#rh-app {
+		margin-left: -10px;
+	}
+}

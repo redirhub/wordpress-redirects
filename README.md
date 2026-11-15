@@ -72,7 +72,13 @@ e2e/run.sh                    # WordPress in Docker: the golden sample over HTTP
 WP_IMAGE=wordpress:6-php7.4-apache e2e/run.sh   # the oldest PHP supported
 e2e/backend.sh ../backend     # against a checkout of redirhub/backend (see the script)
 bin/build-zip.sh              # build/redirhub-redirects.zip
+npm install && npm run build:css   # after changing the admin page's classes (assets/src/admin.css)
 ```
+
+The admin page uses the RedirHub dashboard's design: its tokens and Inter (`assets/src/admin.css`,
+Tailwind CSS 4 with the `rh:` prefix and no global reset, so nothing leaks into the rest of
+wp-admin) and lucide icons (`node bin/build-icons.mjs` writes `includes/Admin/Icons.php`). The
+built `assets/admin.css` is committed; CI checks it matches its source.
 
 `e2e/run.sh` needs Docker, PHP with curl, and Node with Playwright for the admin suite; it uses
 ports 80, 18080 and 18081. `includes/Core/` is pure PHP (no WordPress) and is what the unit tests

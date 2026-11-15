@@ -23,6 +23,19 @@ jobs:
         run: find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l >/dev/null
       - run: vendor/bin/phpunit
 
+  assets:
+    name: Built admin assets match their source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run build:css && node bin/build-icons.mjs
+      - name: assets/admin.css and includes/Admin/Icons.php are committed as built
+        run: git diff --exit-code assets/admin.css includes/Admin/Icons.php
+
   spec:
     name: spec/v1 is the specification's
     runs-on: ubuntu-latest
