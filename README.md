@@ -54,6 +54,15 @@ WordPress.org listing.
   last check, analytics, a self-test over HTTP, the rules in use, settings, disconnect. Site Health
   test and info, an admin notice when downloads keep failing.
 
+## Release
+
+1. Raise the version in `redirhub-redirects.php` (header and `REDIRHUB_REDIRECTS_VERSION`) and
+   `readme.txt` (`Stable tag`, changelog).
+2. Push a tag `v<version>`. The release workflow builds the zip, attaches it to a GitHub release
+   and, once the repository has the `SVN_USERNAME` and `SVN_PASSWORD` secrets of the WordPress.org
+   account, deploys the plugin and the listing's assets (`.wordpress-org/`, regenerated with
+   `node bin/wporg-assets.mjs` after `e2e/run.sh`) to the directory.
+
 ## Develop
 
 ```bash

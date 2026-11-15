@@ -36,6 +36,11 @@ page.on('dialog', (dialog) => dialog.accept());
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 const shot = (name, full = true) => page.screenshot({ path: join(shots, `${name}.png`), fullPage: full });
+// The WordPress.org screenshots (copied to .wordpress-org/ by bin/wporg-assets.mjs): no core update nag.
+const listing = async (name, target = page) => {
+  await page.addStyleTag({ content: '.update-nag,#wp-admin-bar-updates{display:none!important}' });
+  await target.screenshot({ path: join(shots, `wporg-${name}.png`) });
+};
 
 await page.goto(`${site}/wp-login.php`);
 await page.fill('#user_login', 'admin');
@@ -51,6 +56,7 @@ await page.goto(page_);
 check('the page explains what to do and asks for the rules address', await page.locator('#rh-rules-url').isVisible() && await page.locator('.rh-steps li').count() === 3);
 check('status: not connected', (await page.locator('.rh-pill').getAttribute('data-status')) === 'off');
 await shot('1-connect');
+await listing('1');
 
 console.log('\nConnecting');
 await page.fill('#rh-rules-url', 'http://mock:8080/rules/missing.txt');
@@ -83,6 +89,8 @@ await page.waitForLoadState();
 const results = await page.locator('.rh-test li').evaluateAll((items) => items.map((li) => li.dataset.ok));
 check(`the self-test passes (${results.join(',')})`, results.length === 2 && results.every((ok) => ok === '1'));
 await shot('4-connected-tested');
+await listing('2');
+await listing('3', page.locator('.rh-rules'));
 
 console.log('\nRules list');
 await page.fill('#rh-search', 'tour');

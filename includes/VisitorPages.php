@@ -157,7 +157,7 @@ final class VisitorPages {
 
 		return '<!doctype html><html lang="' . $e( $language ) . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
 			. '<meta name="robots" content="noindex"><title>' . $e( $l['pw.title'] ) . ' · RedirHub</title><style>' . self::CSS . '</style></head>'
-			. '<body class="t-accent"><header><div class="brand">RedirHub</div><div class="host mono">' . $e( $host ) . '</div></header>'
+			. '<body class="t-accent"><header><div class="brand">' . self::MARK . 'RedirHub</div><div class="host mono">' . $e( $host ) . '</div></header>'
 			. '<main><div class="wrap">' . $main . '</div></main><footer>' . $foot . '</footer></body></html>' . "\n";
 	}
 
@@ -181,12 +181,15 @@ final class VisitorPages {
 			. '</body></html>' . "\n";
 	}
 
+	/** RedirHub's mark (assets/logo.svg), inline: the visitor's page loads nothing else. */
+	const MARK = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="120 114 368 412" width="25" height="28" aria-hidden="true"><path fill="#E49426" fill-rule="evenodd" d="M130 124H428A50 50 0 0 1 478 174V350L400 428V200H207ZM150 144H268V152H158ZM177 171H268V179H185Z"/><path fill="#20A795" d="M343 251V383L211 515V383Z"/></svg>';
+
 	/** The edge's page style, trimmed to what the password page uses. */
 	const CSS = ':root{--bg:#F6F7F6;--ink:#0E1513;--body:#4B5754;--muted:#5F6B68;--line:#DCE2E0;--line2:#EEF1F0;--accent:#0F7A68;--accent-ink:#0B5E50;--accent-tint:#E3F2EE;--red-ink:#A51C12}'
 		. '*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink)}'
 		. 'body{min-height:100vh;display:flex;flex-direction:column;font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans",Helvetica,Arial,sans-serif}'
 		. 'a{color:var(--accent-ink)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}'
-		. 'header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:24px 40px}.brand{font-weight:600;font-size:15px}.host{font-size:13px;color:var(--muted)}'
+		. 'header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:24px 40px}.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px}.host{font-size:13px;color:var(--muted)}'
 		. 'main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}.wrap{width:100%;max-width:580px;display:flex;flex-direction:column;gap:28px}'
 		. '.route{display:flex;align-items:center}.chip{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px}'
 		. '.chip.ghost{background:transparent;border-style:dashed;border-color:#C3CBC8;color:var(--muted)}.seg{flex:1;min-width:16px;height:2px;background:var(--ink)}.seg.dash{height:0;border-top:2px dashed #C3CBC8;background:none}'

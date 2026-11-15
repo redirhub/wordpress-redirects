@@ -1,0 +1,36 @@
+name: Release
+
+# Push a tag `v1.2.3` whose version matches the plugin header, readme.txt's Stable tag and
+# REDIRHUB_REDIRECTS_VERSION: builds the zip, attaches it to a GitHub release, and deploys to the
+# WordPress.org directory (plugin files to trunk and the tag, .wordpress-org/ to assets) once the
+# repository has the secrets SVN_USERNAME and SVN_PASSWORD of the WordPress.org account.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versions agree
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          grep -q "^ \* Version: *$tag$" redirhub-redirects.php
+          grep -q "define( 'REDIRHUB_REDIRECTS_VERSION', '$tag' );" redirhub-redirects.php
+          grep -q "^Stable tag: $tag$" readme.txt
+      - run: bin/build-zip.sh
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: build/redirhub-redirects.zip
+          generate_release_notes: true
+      - name: Deploy to WordPress.org
+        if: ${{ env.SVN_USERNAME != '' }}
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: redirhub-redirects
+        uses: 10up/action-wordpress-plugin-deploy@stable

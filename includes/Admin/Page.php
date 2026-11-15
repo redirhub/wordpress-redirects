@@ -299,7 +299,7 @@ final class Page {
 		$level = Status::level();
 
 		echo '<div class="wrap rh">';
-		echo '<h1 class="rh-title"><span class="rh-logo" aria-hidden="true"></span>' . esc_html__( 'RedirHub Redirects', 'redirhub-redirects' ) . ' ' . self::pill( $level ) . '</h1>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in pill().
+		echo '<h1 class="rh-title"><img class="rh-logo" src="' . esc_url( plugin_dir_url( REDIRHUB_REDIRECTS_FILE ) . 'assets/logo.svg' ) . '" alt="" width="26" height="29">' . esc_html__( 'RedirHub Redirects', 'redirhub-redirects' ) . ' ' . self::pill( $level ) . '</h1>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in pill().
 		echo '<hr class="wp-header-end">';
 		foreach ( (array) ( $flash['messages'] ?? array() ) as $message ) {
 			printf( '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>', esc_attr( $message[0] ), esc_html( $message[1] ) );

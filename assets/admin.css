@@ -1,7 +1,7 @@
 /* RedirHub Redirects: Tools → RedirHub. WordPress admin colours, RedirHub's accent. */
 .rh { --rh-accent: #0f7a68; --rh-accent-tint: #e3f2ee; --rh-amber: #8a4b08; --rh-amber-tint: #fdf0dc; --rh-red: #a51c12; --rh-red-tint: #fde8e6; --rh-muted: #646970; max-width: 1200px; }
 .rh-title { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.rh-logo { width: 26px; height: 26px; border-radius: 7px; background: var(--rh-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h12'/%3E%3Cpath d='M12 6l6 6-6 6'/%3E%3C/svg%3E") center / 16px no-repeat; }
+.rh-logo { display: block; width: 26px; height: 29px; }
 .rh-pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 500; line-height: 1.6; background: #f0f0f1; color: #50575e; }
 .rh-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .rh-pill--ok { background: var(--rh-accent-tint); color: var(--rh-accent); }
