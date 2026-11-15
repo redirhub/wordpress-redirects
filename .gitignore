@@ -1,0 +1,6 @@
+/vendor/
+/node_modules/
+/build/
+/e2e/screenshots/
+.phpunit.result.cache
+*.zip

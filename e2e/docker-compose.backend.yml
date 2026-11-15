@@ -1,0 +1,11 @@
+# Added for the run against the real RedirHub backend (e2e/backend.sh): an S3-compatible bucket
+# the backend publishes rules files to and WordPress downloads them from.
+services:
+  s3:
+    image: chrislusf/seaweedfs:latest
+    command: ["server", "-s3", "-dir=/data", "-volume.max=100", "-master.volumeSizeLimitMB=16"]
+    ports: ["19000:8333"]
+    tmpfs: [/data]
+  wordpress:
+    extra_hosts:
+      - "blog.example.test:127.0.0.1"

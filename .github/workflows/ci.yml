@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    name: Unit and golden sample (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - run: composer install --no-interaction --no-progress
+      - name: Lint
+        run: find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l >/dev/null
+      - run: vendor/bin/phpunit
+
+  spec:
+    name: spec/v1 is the specification's
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare with redirhub/integration-spec main
+        run: |
+          for file in rules.txt requests.tsv reports.txt; do
+            curl -fsSL "https://raw.githubusercontent.com/redirhub/integration-spec/main/spec/v1/$file" -o "/tmp/$file"
+            diff -u "/tmp/$file" "spec/v1/$file"
+          done
+
+  e2e:
+    name: WordPress end to end (${{ matrix.image }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ['wordpress:6-php8.3-apache', 'wordpress:6-php7.4-apache']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Playwright
+        working-directory: e2e
+        run: npm install --no-save playwright@1 && npx playwright install --with-deps chromium
+      - name: Golden sample, scenarios and the admin page
+        run: WP_IMAGE=${{ matrix.image }} e2e/run.sh --keep
+      - name: Plugin Check (the WordPress.org review)
+        if: matrix.image == 'wordpress:6-php8.3-apache'
+        working-directory: e2e
+        run: |
+          ../bin/build-zip.sh
+          docker compose cp ../build/redirhub-redirects wordpress:/var/www/html/wp-content/plugins/rh-dist
+          docker compose exec -T -u root wordpress chown -R www-data /var/www/html/wp-content/plugins/rh-dist
+          docker compose exec -T cli wp plugin install plugin-check --activate
+          docker compose exec -T cli wp plugin check rh-dist --slug=redirhub-redirects --severity=1 | tee /tmp/check.txt
+          grep -q "No errors found" /tmp/check.txt
+      - name: Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ strategy.job-index }}
+          path: e2e/screenshots
+          if-no-files-found: ignore
+
+  release:
+    name: Plugin zip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bin/build-zip.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: redirhub-redirects
+          path: build/redirhub-redirects.zip

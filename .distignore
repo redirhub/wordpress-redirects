@@ -1,0 +1,19 @@
+# Not shipped in the plugin zip (bin/build-zip.sh, WordPress.org).
+.git
+.github
+.gitignore
+.gitattributes
+.distignore
+.phpunit.result.cache
+bin
+build
+composer.json
+composer.lock
+e2e
+node_modules
+phpunit.xml.dist
+spec
+tests
+vendor
+README.md
+NOTICE
