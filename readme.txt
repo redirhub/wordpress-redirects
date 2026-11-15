@@ -1,6 +1,6 @@
 === RedirHub Redirects ===
 Contributors: redirhub
-Tags: redirects, 301 redirect, short links, migration, analytics
+Tags: redirect, 301 redirect, 404, url shortener, link tracking
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4

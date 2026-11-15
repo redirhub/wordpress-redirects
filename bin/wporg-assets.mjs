@@ -28,6 +28,7 @@ const banner = (scale) => `<!doctype html><html><head><meta charset="utf-8"><sty
   .wrap{display:flex;align-items:center;gap:30px;height:100%;padding:0 44px}
   .mark{flex:none}
   h1{font-size:40px;line-height:1.05;letter-spacing:-.03em;font-weight:700}
+  .kicker{margin-top:6px;font-size:21px;font-weight:600;letter-spacing:-.01em;color:#1C6DB6}
   p{margin-top:10px;font-size:17px;line-height:1.4;color:#4B5754;max-width:440px}
   .route{display:flex;align-items:center;margin-top:20px;max-width:430px}
   .chip{padding:5px 11px;border-radius:999px;background:#fff;border:1px solid #DCE2E0;font:500 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
@@ -37,8 +38,8 @@ const banner = (scale) => `<!doctype html><html><head><meta charset="utf-8"><sty
 </style></head><body><div class="wrap">
   <div class="mark">${mark(150)}</div>
   <div>
-    <h1>RedirHub Redirects</h1>
-    <p>Every old link lands on the right page.<br>Keep your rankings, see every click.</p>
+    <h1>RedirHub</h1><div class="kicker">301 Redirects, 404 Fixes &amp; Short Links</div>
+    <p>Every old link lands on the right page. Keep your rankings, see every click.</p>
     <div class="route"><span class="chip">/old-page</span><span class="seg"></span><span class="node"><svg viewBox="0 0 24 24"><path d="M5 12h12"/><path d="M12 6l6 6-6 6"/></svg></span><span class="seg"></span><span class="chip">/new-page</span></div>
   </div>
 </div></body></html>`;

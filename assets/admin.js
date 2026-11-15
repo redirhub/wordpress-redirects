@@ -7,6 +7,15 @@
 		return;
 	}
 
+	// Notices WordPress and other plugins print above the page (the update nag included) go into
+	// the page's content, under its header.
+	var slot = app.querySelector('[data-notices]');
+	if (slot) {
+		document.querySelectorAll('#wpbody-content > .update-nag, #wpbody-content > .notice, #wpbody-content > .error, #wpbody-content > .updated').forEach(function (notice) {
+			slot.appendChild(notice);
+		});
+	}
+
 	// Ask before disconnecting: the redirects stop at once.
 	app.querySelectorAll('[data-confirm]').forEach(function (button) {
 		button.addEventListener('click', function (event) {

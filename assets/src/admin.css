@@ -223,3 +223,16 @@ body.tools_page_redirhub-redirects #wpfooter {
 		margin-left: -10px;
 	}
 }
+
+/* Notices of WordPress and other plugins, moved into the page: their own look, not the reset's. */
+#rh-app [data-notices] :where(.notice, .update-nag, .error, .updated) {
+	margin: 0;
+}
+#rh-app [data-notices] :where(p) {
+	margin: 0.5em 0;
+	font-size: 13px;
+}
+#rh-app [data-notices] :where(a) {
+	color: #2271b1;
+	text-decoration: underline;
+}

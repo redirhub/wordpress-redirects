@@ -54,6 +54,16 @@ WordPress.org listing.
   last check, analytics, a self-test over HTTP, the rules in use, settings, disconnect. Site Health
   test and info, an admin notice when downloads keep failing.
 
+## Launch on WordPress.org
+
+1. Submit `build/redirhub-redirects.zip` as it is: the plugin header and `readme.txt` both say
+   "RedirHub Redirects", which gives the slug `redirhub-redirects`. The slug comes from the header
+   at submission and never changes.
+2. Once approved, and before the first release reaches the directory, apply
+   `docs/listing-name.patch` (the listing's name for search: "RedirHub – 301 Redirects, 404 Fixes &
+   Short Links", in the header and in `readme.txt` alike, as Plugin Check requires). The slug stays.
+3. Add the `SVN_USERNAME` and `SVN_PASSWORD` secrets, then release (below).
+
 ## Release
 
 1. Raise the version in `redirhub-redirects.php` (header and `REDIRHUB_REDIRECTS_VERSION`) and

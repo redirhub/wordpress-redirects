@@ -39,9 +39,10 @@ final class View {
 		$tab = in_array( $tab, self::TABS, true ) ? $tab : 'overview';
 
 		echo '<div id="rh-app" class="rh:min-h-screen">';
-		self::header( $level, $rules );
-		echo '<div class="rh:mx-auto rh:max-w-[1120px] rh:px-4 rh:md:px-8 rh:py-6 rh:flex rh:flex-col rh:gap-6">';
-		echo '<hr class="wp-header-end" style="display:none">';
+		self::header( $level, $rules, Status::OFF === $level ? null : $tab );
+		echo '<div class="rh:@container rh:mx-auto rh:max-w-[1120px] rh:px-4 rh:md:px-8 rh:py-6 rh:flex rh:flex-col rh:gap-5">';
+		// WordPress puts other plugins' notices after this; admin.js moves its update nag here too.
+		echo '<div data-notices class="rh:contents"><hr class="wp-header-end" style="display:none"></div>';
 		foreach ( (array) ( $flash['messages'] ?? array() ) as $message ) {
 			self::alert( (string) $message[0], (string) $message[1], true );
 		}
@@ -49,7 +50,6 @@ final class View {
 		if ( Status::OFF === $level ) {
 			self::onboarding( (string) ( $flash['rules_url'] ?? '' ) );
 		} else {
-			self::tabs( $tab, null === $rules ? 0 : $rules->count() );
 			if ( 'redirects' === $tab ) {
 				self::redirects( $rules );
 			} elseif ( 'settings' === $tab ) {
@@ -68,15 +68,16 @@ final class View {
 	 *
 	 * @param string       $level Status::level().
 	 * @param RuleSet|null $rules The rules in use.
+	 * @param string|null  $tab   The tab shown; null shows no tabs (not connected).
 	 */
-	private static function header( string $level, ?RuleSet $rules ): void {
+	private static function header( string $level, ?RuleSet $rules, ?string $tab ): void {
 		$subtitle = Status::OFF === $level || null === $rules
 			? __( 'Every old link, on the right page.', 'redirhub-redirects' )
 			/* translators: 1: hostnames, 2: number of redirects. */
 			: sprintf( _n( '%1$s · %2$s redirect', '%1$s · %2$s redirects', $rules->count(), 'redirhub-redirects' ), implode( ', ', $rules->hostnames() ), number_format_i18n( $rules->count() ) );
 		?>
 		<header class="rh:bg-card rh:border-b rh:border-border">
-			<div class="rh:mx-auto rh:max-w-[1120px] rh:px-4 rh:md:px-8 rh:py-4 rh:flex rh:flex-wrap rh:items-center rh:gap-x-4 rh:gap-y-3">
+			<div class="rh:mx-auto rh:max-w-[1120px] rh:px-4 rh:md:px-8 rh:pt-5 rh:pb-4 rh:flex rh:flex-wrap rh:items-center rh:gap-x-4 rh:gap-y-3">
 				<img src="<?php echo esc_url( plugin_dir_url( REDIRHUB_REDIRECTS_FILE ) . 'assets/logo.svg' ); ?>" alt="" width="32" height="36" class="rh:h-9 rh:w-8">
 				<div class="rh:min-w-0 rh:flex-1">
 					<div class="rh:flex rh:flex-wrap rh:items-center rh:gap-x-3 rh:gap-y-1">
@@ -90,6 +91,11 @@ final class View {
 					<?php echo Icons::svg( 'arrow-up-right', 'rh:size-4 rh:text-muted-foreground' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</a>
 			</div>
+			<?php if ( null !== $tab ) : ?>
+				<div class="rh:mx-auto rh:max-w-[1120px] rh:px-4 rh:md:px-8">
+					<?php self::tabs( $tab, null === $rules ? 0 : $rules->count() ); ?>
+				</div>
+			<?php endif; ?>
 		</header>
 		<?php
 	}
@@ -106,13 +112,13 @@ final class View {
 			'redirects' => __( 'Redirects', 'redirhub-redirects' ),
 			'settings'  => __( 'Settings', 'redirhub-redirects' ),
 		);
-		echo '<nav class="rh:flex rh:gap-6 rh:border-b rh:border-border rh:-mb-2" aria-label="' . esc_attr__( 'Sections', 'redirhub-redirects' ) . '">';
+		echo '<nav class="rh:-mb-px rh:flex rh:gap-6 rh:overflow-x-auto" aria-label="' . esc_attr__( 'Sections', 'redirhub-redirects' ) . '">';
 		foreach ( $tabs as $tab => $label ) {
 			$active = $tab === $current;
 			printf(
 				'<a href="%1$s" class="%2$s"%3$s data-tab="%4$s">%5$s%6$s</a>',
 				esc_url( Page::url( 'overview' === $tab ? array() : array( 'tab' => $tab ) ) ),
-				esc_attr( 'rh:-mb-px rh:inline-flex rh:items-center rh:gap-2 rh:border-b-2 rh:pb-3 rh:pt-1 rh:text-sm rh:font-medium rh:transition-colors ' . ( $active ? 'rh:border-primary-hover rh:text-primary-hover' : 'rh:border-transparent rh:text-muted-foreground rh:hover:text-foreground' ) ),
+				esc_attr( 'rh:inline-flex rh:items-center rh:gap-2 rh:whitespace-nowrap rh:border-b-2 rh:pb-3 rh:pt-1 rh:text-sm rh:font-medium rh:transition-colors ' . ( $active ? 'rh:border-primary-hover rh:text-primary-hover' : 'rh:border-transparent rh:text-muted-foreground rh:hover:text-foreground' ) ),
 				$active ? ' aria-current="page"' : '',
 				esc_attr( $tab ),
 				esc_html( $label ),
@@ -146,27 +152,14 @@ final class View {
 			esc_html__( 'Connect, then press “Check now” in RedirHub. That’s it.', 'redirhub-redirects' ),
 		);
 		?>
-		<div class="rh:grid rh:items-start rh:gap-8 rh:lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] rh:lg:pt-4">
-			<section class="rh:flex rh:flex-col rh:gap-6">
-				<div>
+		<div class="rh:grid rh:items-start rh:gap-6 rh:@4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] rh:@4xl:gap-x-10 rh:@4xl:grid-rows-[auto_1fr] rh:@4xl:pt-2">
+				<div class="rh:@4xl:col-start-1 rh:@4xl:row-start-1">
 					<span class="rh:inline-flex rh:items-center rh:gap-1.5 rh:rounded-full rh:border rh:border-info-edge rh:bg-info-soft rh:px-2.5 rh:py-0.5 rh:text-xs rh:font-medium rh:text-accent-foreground"><?php echo Icons::svg( 'zap', 'rh:size-3.5' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( 'About 2 minutes to set up', 'redirhub-redirects' ); ?></span>
 					<h2 class="rh:mt-4 rh:text-3xl rh:font-semibold rh:leading-tight rh:tracking-tight rh:text-foreground rh:md:text-4xl"><?php esc_html_e( 'Every old link, on the right page', 'redirhub-redirects' ); ?></h2>
 					<p class="rh:mt-3 rh:max-w-xl rh:text-base rh:leading-relaxed rh:text-secondary-foreground"><?php esc_html_e( 'Pages move and links get shared for years. Send every one of those visits where it belongs, and see what your links do.', 'redirhub-redirects' ); ?></p>
 				</div>
-				<ul class="rh:grid rh:gap-3 rh:sm:grid-cols-2">
-					<?php foreach ( $benefits as list( $icon, $title, $text ) ) : ?>
-						<li class="rh:flex rh:gap-3 rh:rounded-xl rh:border rh:border-border rh:bg-card rh:p-4 rh:shadow-card">
-							<span class="rh:flex rh:size-9 rh:flex-none rh:items-center rh:justify-center rh:rounded-lg rh:bg-accent rh:text-accent-foreground"><?php echo Icons::svg( $icon, 'rh:size-4.5' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-							<span class="rh:min-w-0">
-								<span class="rh:block rh:text-sm rh:font-semibold rh:text-foreground"><?php echo esc_html( $title ); ?></span>
-								<span class="rh:mt-1 rh:block rh:text-[13px] rh:leading-relaxed rh:text-muted-foreground"><?php echo esc_html( $text ); ?></span>
-							</span>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</section>
 
-			<form class="rh-connect rh:order-first rh:lg:order-none rh:rounded-2xl rh:border rh:border-border rh:bg-card rh:shadow-pop" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<form class="rh-connect rh:@4xl:col-start-2 rh:@4xl:row-span-2 rh:@4xl:row-start-1 rh:rounded-2xl rh:border rh:border-border rh:bg-card rh:shadow-pop" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="redirhub_connect">
 				<?php wp_nonce_field( 'redirhub_connect' ); ?>
 				<div class="rh:border-b rh:border-border rh:px-6 rh:py-5">
@@ -187,6 +180,19 @@ final class View {
 					<button type="submit" data-busy="<?php esc_attr_e( 'Connecting…', 'redirhub-redirects' ); ?>" class="<?php echo esc_attr( self::BUTTON_PRIMARY . ' rh:w-full rh:h-11 rh:text-[15px]' ); ?>"><?php esc_html_e( 'Connect', 'redirhub-redirects' ); ?><?php echo Icons::svg( 'arrow-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></button>
 				</div>
 			</form>
+			<section class="rh:@container rh:@4xl:col-start-1 rh:@4xl:row-start-2">
+				<ul class="rh:grid rh:gap-3 rh:@lg:grid-cols-2">
+					<?php foreach ( $benefits as list( $icon, $title, $text ) ) : ?>
+						<li class="rh:flex rh:gap-3 rh:rounded-xl rh:border rh:border-border rh:bg-card rh:p-4 rh:shadow-card">
+							<span class="rh:flex rh:size-9 rh:flex-none rh:items-center rh:justify-center rh:rounded-lg rh:bg-accent rh:text-accent-foreground"><?php echo Icons::svg( $icon, 'rh:size-4.5' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+							<span class="rh:min-w-0">
+								<span class="rh:block rh:text-sm rh:font-semibold rh:text-foreground"><?php echo esc_html( $title ); ?></span>
+								<span class="rh:mt-1 rh:block rh:text-[13px] rh:leading-relaxed rh:text-muted-foreground"><?php echo esc_html( $text ); ?></span>
+							</span>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</section>
 		</div>
 		<?php
 	}
@@ -269,16 +275,26 @@ final class View {
 			}
 			$badge = $synced && '' === $state['error'] ? self::badge( 'success', __( 'Up to date', 'redirhub-redirects' ) ) : self::badge( 'warning', __( 'Using the last good copy', 'redirhub-redirects' ) );
 		}
-		self::row(
-			'rules',
-			'refresh-cw',
-			null === $rules
-				? __( 'Redirects', 'redirhub-redirects' )
-				/* translators: %s: number of redirects. */
-				: sprintf( _n( '%s redirect live', '%s redirects live', $rules->count(), 'redirhub-redirects' ), '<span data-rules-count="' . esc_attr( (string) $rules->count() ) . '">' . esc_html( number_format_i18n( $rules->count() ) ) . '</span>' ),
-			$detail,
-			$badge . self::action_button( 'sync', __( 'Update now', 'redirhub-redirects' ), 'refresh-cw' )
-		);
+		if ( null !== $rules && 0 === $rules->count() ) {
+			self::row(
+				'rules',
+				'route',
+				__( 'No redirects yet', 'redirhub-redirects' ) . '<span data-rules-count="0"></span>',
+				__( 'Add your first redirect in RedirHub: an old page, a short link or a catch-all. It is live here within a minute.', 'redirhub-redirects' ),
+				self::link_button( Page::DASHBOARD, __( 'Add in RedirHub', 'redirhub-redirects' ), true ) . self::action_button( 'sync', __( 'Update now', 'redirhub-redirects' ), 'refresh-cw' )
+			);
+		} else {
+			self::row(
+				'rules',
+				'refresh-cw',
+				null === $rules
+					? __( 'Redirects', 'redirhub-redirects' )
+					/* translators: %s: number of redirects. */
+					: sprintf( _n( '%s redirect live', '%s redirects live', $rules->count(), 'redirhub-redirects' ), '<span data-rules-count="' . esc_attr( (string) $rules->count() ) . '">' . esc_html( number_format_i18n( $rules->count() ) ) . '</span>' ),
+				$detail,
+				$badge . self::action_button( 'sync', __( 'Update now', 'redirhub-redirects' ), 'refresh-cw' )
+			);
+		}
 
 		// Domain verified.
 		if ( $verified ) {
@@ -336,11 +352,11 @@ final class View {
 			$synced ? array( 'success', __( 'In sync', 'redirhub-redirects' ) ) : array( Status::FAILING === $level ? 'danger' : 'warning', Status::FAILING === $level ? __( 'Can’t update', 'redirhub-redirects' ) : __( 'Update failing', 'redirhub-redirects' ) ),
 			$verified ? array( 'success', __( 'Verified', 'redirhub-redirects' ) ) : array( 'warning', __( 'Not verified yet', 'redirhub-redirects' ) ),
 		);
-		echo '<section class="rh:rounded-xl rh:border rh:border-border rh:bg-card rh:p-4 rh:shadow-card rh:md:p-5" aria-label="' . esc_attr__( 'How your redirects reach visitors', 'redirhub-redirects' ) . '">';
-		echo '<div class="rh:flex rh:flex-col rh:items-stretch rh:gap-3 rh:md:flex-row rh:md:items-center rh:md:gap-0">';
+		echo '<section class="rh:@container rh:rounded-xl rh:border rh:border-border rh:bg-card rh:p-4 rh:shadow-card rh:@3xl:p-5" aria-label="' . esc_attr__( 'How your redirects reach visitors', 'redirhub-redirects' ) . '">';
+		echo '<div class="rh:flex rh:flex-col rh:items-stretch rh:gap-3 rh:@3xl:flex-row rh:@3xl:items-center rh:@3xl:gap-0">';
 		foreach ( $nodes as $index => list( $icon, $title, $text ) ) {
 			printf(
-				'<div class="rh:flex rh:min-w-0 rh:items-center rh:gap-3 rh:md:flex-none rh:md:max-w-[30%%]"><span class="%1$s">%2$s</span><span class="rh:min-w-0"><span class="rh:block rh:text-sm rh:font-semibold rh:text-foreground">%3$s</span><span class="rh:block rh:truncate rh:font-mono rh:text-xs rh:text-muted-foreground">%4$s</span></span></div>',
+				'<div class="rh:flex rh:min-w-0 rh:items-center rh:gap-3 rh:@3xl:flex-none rh:@3xl:max-w-[30%%]"><span class="%1$s">%2$s</span><span class="rh:min-w-0"><span class="rh:block rh:text-sm rh:font-semibold rh:text-foreground">%3$s</span><span class="rh:block rh:truncate rh:font-mono rh:text-xs rh:text-muted-foreground">%4$s</span></span></div>',
 				esc_attr( 'rh:flex rh:size-10 rh:flex-none rh:items-center rh:justify-center rh:rounded-xl rh:border rh:border-border ' . ( 1 === $index ? 'rh:bg-accent rh:text-accent-foreground' : 'rh:bg-card rh:text-secondary-foreground' ) ),
 				Icons::svg( $icon, 'rh:size-5' ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				esc_html( $title ),
@@ -350,8 +366,8 @@ final class View {
 				list( $tone, $label ) = $links[ $index ];
 				$line                 = 'success' === $tone ? 'rh:bg-brand-teal' : ( 'danger' === $tone ? 'rh-dash rh:text-danger' : 'rh-dash rh:text-brand-amber' );
 				printf(
-					'<div class="rh:flex rh:items-center rh:gap-2 rh:pl-[52px] rh:md:flex-1 rh:md:px-3"><span class="%1$s"></span>%2$s<span class="%1$s"></span></div>',
-					esc_attr( 'rh:hidden rh:h-0.5 rh:min-w-4 rh:flex-1 rh:md:block ' . $line ),
+					'<div class="rh:flex rh:items-center rh:gap-2 rh:pl-[52px] rh:@3xl:flex-1 rh:@3xl:px-3"><span class="%1$s"></span>%2$s<span class="%1$s"></span></div>',
+					esc_attr( 'rh:hidden rh:h-0.5 rh:min-w-4 rh:flex-1 rh:@3xl:block ' . $line ),
 					self::badge( $tone, $label ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				);
 			}
@@ -444,7 +460,7 @@ final class View {
 		$rows  = array_slice( $rows, ( $paged - 1 ) * Page::PER_PAGE, Page::PER_PAGE );
 		$base  = array( 'tab' => 'redirects' ) + ( '' === $search ? array() : array( 's' => $search ) );
 		?>
-		<section class="rh-rules rh:overflow-hidden rh:rounded-xl rh:border rh:border-border rh:bg-card rh:shadow-card">
+		<section class="rh-rules rh:@container rh:overflow-hidden rh:rounded-xl rh:border rh:border-border rh:bg-card rh:shadow-card">
 			<div class="rh:flex rh:flex-wrap rh:items-center rh:gap-3 rh:border-b rh:border-border rh:px-5 rh:py-4">
 				<div class="rh:min-w-0 rh:flex-1">
 					<h2 class="rh:text-base rh:font-semibold rh:text-foreground"><?php esc_html_e( 'Redirects in use', 'redirhub-redirects' ); ?></h2>
@@ -464,7 +480,7 @@ final class View {
 					<label class="rh:relative rh:flex-1 rh:sm:w-72">
 						<span class="rh:sr-only"><?php esc_html_e( 'Search redirects', 'redirhub-redirects' ); ?></span>
 						<?php echo Icons::svg( 'search', 'rh:pointer-events-none rh:absolute rh:left-3 rh:top-1/2 rh:size-4 rh:-translate-y-1/2 rh:text-muted-foreground' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<input type="search" id="rh-search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search paths and destinations', 'redirhub-redirects' ); ?>" class="<?php echo esc_attr( self::INPUT . ' rh:mt-0 rh:pl-9' ); ?>">
+						<input type="search" id="rh-search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'Search redirects', 'redirhub-redirects' ); ?>" class="<?php echo esc_attr( self::INPUT . ' rh:mt-0 rh:pl-9' ); ?>">
 					</label>
 					<button class="<?php echo esc_attr( self::BUTTON_SECONDARY ); ?>"><?php esc_html_e( 'Search', 'redirhub-redirects' ); ?></button>
 				</form>
@@ -476,31 +492,32 @@ final class View {
 					<p class="rh:text-[13px] rh:text-muted-foreground"><?php echo '' === $search ? esc_html__( 'Add one in RedirHub and it shows up here within a minute.', 'redirhub-redirects' ) : esc_html__( 'Try part of the old address or of the destination.', 'redirhub-redirects' ); ?></p>
 				</div>
 			<?php else : ?>
-				<table class="rh-table rh:w-full rh:text-left rh:text-sm rh:md:table-fixed">
-					<thead class="rh:hidden rh:bg-background rh:text-xs rh:font-medium rh:text-muted-foreground rh:md:table-header-group">
+				<table class="rh-table rh:w-full rh:text-left rh:text-sm rh:@3xl:table-fixed">
+					<thead class="rh:hidden rh:bg-background rh:text-xs rh:font-medium rh:text-muted-foreground rh:@3xl:table-header-group">
 						<tr>
-							<th scope="col" class="rh:w-[31%] rh:px-5 rh:py-2.5 rh:font-medium"><?php esc_html_e( 'From', 'redirhub-redirects' ); ?></th>
-							<th scope="col" class="rh:w-[33%] rh:px-5 rh:py-2.5 rh:font-medium"><?php esc_html_e( 'To', 'redirhub-redirects' ); ?></th>
-							<th scope="col" class="rh:w-[15%] rh:px-5 rh:py-2.5 rh:font-medium"><?php esc_html_e( 'Type', 'redirhub-redirects' ); ?></th>
-							<th scope="col" class="rh:px-5 rh:py-2.5 rh:font-medium"><?php esc_html_e( 'Options', 'redirhub-redirects' ); ?></th>
+							<th scope="col" class="rh:w-[38%] rh:px-5 rh:py-2.5 rh:font-medium"><?php esc_html_e( 'From', 'redirhub-redirects' ); ?></th>
+							<th scope="col" class="rh:w-[38%] rh:px-5 rh:py-2.5 rh:font-medium"><?php esc_html_e( 'To', 'redirhub-redirects' ); ?></th>
+							<th scope="col" class="rh:px-5 rh:py-2.5 rh:font-medium"><?php esc_html_e( 'Type', 'redirhub-redirects' ); ?></th>
 						</tr>
 					</thead>
 					<tbody class="rh:divide-y rh:divide-border">
 					<?php foreach ( $rows as list( $host, $path, $stored ) ) : ?>
-						<tr class="rh:block rh:px-5 rh:py-3 rh:md:table-row rh:md:p-0 rh:hover:bg-background">
-							<td class="rh:block rh:md:table-cell rh:md:px-5 rh:md:py-3">
+						<?php $from = '*' === $path ? $host . '/*' : $host . $path; ?>
+						<tr class="rh:block rh:px-5 rh:py-3 rh:@3xl:table-row rh:@3xl:p-0 rh:hover:bg-background">
+							<td class="rh:block rh:min-w-0 rh:@3xl:table-cell rh:@3xl:px-5 rh:@3xl:py-3 rh:@3xl:align-top">
 								<?php if ( '*' === $path ) : ?>
-									<span class="rh:font-mono rh:text-[13px] rh:text-foreground"><?php echo esc_html( $host ); ?>/*</span>
+									<span class="rh:line-clamp-2 rh:wrap-anywhere rh:font-mono rh:text-[13px] rh:text-foreground" title="<?php echo esc_attr( $from ); ?>"><?php echo esc_html( $from ); ?></span>
 									<span class="rh:block rh:text-xs rh:text-muted-foreground"><?php esc_html_e( 'Every address this site can’t find', 'redirhub-redirects' ); ?></span>
 								<?php else : ?>
-									<a class="rh:wrap-anywhere rh:font-mono rh:text-[13px] rh:text-primary-hover rh:hover:underline" href="<?php echo esc_url( set_url_scheme( 'http://' . $host . Path::escape( $path ) ) ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $host . $path ); ?></a>
+									<a class="rh:line-clamp-2 rh:wrap-anywhere rh:font-mono rh:text-[13px] rh:text-primary-hover rh:hover:underline" href="<?php echo esc_url( set_url_scheme( 'http://' . $host . Path::escape( $path ) ) ); ?>" title="<?php echo esc_attr( $from ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $from ); ?></a>
 								<?php endif; ?>
 							</td>
-							<td class="rh-target rh:block rh:md:table-cell rh:md:px-5 rh:md:py-3">
-								<span class="rh:flex rh:min-w-0 rh:items-start rh:gap-1.5 rh:text-secondary-foreground"><?php echo Icons::svg( 'corner-down-right', 'rh:mt-0.5 rh:size-3.5 rh:text-muted-foreground rh:md:hidden' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><a class="rh:wrap-anywhere rh:hover:underline" href="<?php echo esc_url( $stored[1] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $stored[1] ); ?></a></span>
+							<td class="rh-target rh:block rh:min-w-0 rh:pt-1 rh:@3xl:table-cell rh:@3xl:px-5 rh:@3xl:py-3 rh:@3xl:align-top">
+								<span class="rh:flex rh:min-w-0 rh:items-start rh:gap-1.5 rh:text-secondary-foreground"><?php echo Icons::svg( 'corner-down-right', 'rh:mt-0.5 rh:size-3.5 rh:text-muted-foreground rh:@3xl:hidden' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><a class="rh:line-clamp-2 rh:wrap-anywhere rh:hover:underline" href="<?php echo esc_url( $stored[1] ); ?>" title="<?php echo esc_attr( $stored[1] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $stored[1] ); ?></a></span>
 							</td>
-							<td class="rh:inline-block rh:pt-2 rh:pr-2 rh:md:table-cell rh:md:px-5 rh:md:py-3"><?php echo self::type_badge( $stored[2] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-							<td class="rh:inline-block rh:pt-2 rh:md:table-cell rh:md:px-5 rh:md:py-3"><?php echo self::option_chips( $stored ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+							<td class="rh:block rh:pt-2 rh:@3xl:table-cell rh:@3xl:px-5 rh:@3xl:py-3 rh:@3xl:align-top">
+								<span class="rh:flex rh:flex-wrap rh:items-center rh:gap-1"><?php echo self::type_badge( $stored[2] ) . self::option_chips( $stored ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+							</td>
 						</tr>
 					<?php endforeach; ?>
 					</tbody>
@@ -580,13 +597,13 @@ final class View {
 		}
 		$html = '';
 		foreach ( $chips as list( $icon, $label ) ) {
-			$html .= '<span class="rh-badge rh:mb-1 rh:mr-1 rh:inline-flex rh:items-center rh:gap-1 rh:whitespace-nowrap rh:rounded-full rh:bg-secondary rh:px-2 rh:py-0.5 rh:text-xs rh:text-secondary-foreground">' . Icons::svg( $icon, 'rh:size-3' ) . esc_html( $label ) . '</span>';
+			$html .= '<span class="rh-badge rh:inline-flex rh:items-center rh:gap-1 rh:whitespace-nowrap rh:rounded-full rh:bg-secondary rh:px-2 rh:py-0.5 rh:text-xs rh:text-secondary-foreground">' . Icons::svg( $icon, 'rh:size-3' ) . esc_html( $label ) . '</span>';
 		}
 		if ( ! Settings::link_options() && array() !== $options ) {
 			$html .= '<span class="rh-badge rh-badge--off rh:inline-flex rh:rounded-full rh:bg-warning-soft rh:px-2 rh:py-0.5 rh:text-xs rh:text-warning">' . esc_html__( 'Extras off', 'redirhub-redirects' ) . '</span>';
 		}
 
-		return '' === $html ? '<span class="rh:text-muted-foreground">—</span>' : $html;
+		return $html;
 	}
 
 	/* ------------------------------------------------------------------ settings */

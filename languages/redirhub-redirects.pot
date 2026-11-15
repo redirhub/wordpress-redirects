@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-15T17:43:24+00:00\n"
+"POT-Creation-Date: 2026-11-15T19:33:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: redirhub-redirects\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: redirhub-redirects.php
 #: includes/Admin/Page.php:48
 #: includes/Admin/SiteHealth.php:86
-#: includes/Admin/View.php:83
+#: includes/Admin/View.php:84
 msgid "RedirHub Redirects"
 msgstr ""
 
@@ -35,8 +35,8 @@ msgstr ""
 #. Author of the plugin
 #: redirhub-redirects.php
 #: includes/Admin/Page.php:49
-#: includes/Admin/View.php:143
-#: includes/Admin/View.php:331
+#: includes/Admin/View.php:149
+#: includes/Admin/View.php:347
 msgid "RedirHub"
 msgstr ""
 
@@ -50,7 +50,7 @@ msgid "Almost there: connect your domain, and every old link starts landing on t
 msgstr ""
 
 #: includes/Admin/Notices.php:41
-#: includes/Admin/View.php:187
+#: includes/Admin/View.php:180
 msgid "Connect"
 msgstr ""
 
@@ -71,8 +71,8 @@ msgid "Copied"
 msgstr ""
 
 #: includes/Admin/Page.php:85
-#: includes/Admin/View.php:107
-#: includes/Admin/View.php:297
+#: includes/Admin/View.php:113
+#: includes/Admin/View.php:313
 msgid "Settings"
 msgstr ""
 
@@ -235,8 +235,8 @@ msgid "Your redirects are up to date"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:52
-#: includes/Admin/View.php:106
-#: includes/Admin/View.php:276
+#: includes/Admin/View.php:112
+#: includes/Admin/View.php:291
 msgid "Redirects"
 msgstr ""
 
@@ -269,13 +269,13 @@ msgid "Version"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:93
-#: includes/Admin/View.php:252
+#: includes/Admin/View.php:258
 msgid "Status"
 msgstr ""
 
 #: includes/Admin/SiteHealth.php:97
-#: includes/Admin/View.php:204
-#: includes/Admin/View.php:671
+#: includes/Admin/View.php:210
+#: includes/Admin/View.php:688
 msgid "Rules address"
 msgstr ""
 
@@ -341,272 +341,282 @@ msgstr ""
 msgid "%s ago"
 msgstr ""
 
-#: includes/Admin/View.php:74
+#: includes/Admin/View.php:75
 msgid "Every old link, on the right page."
 msgstr ""
 
 #. translators: 1: hostnames, 2: number of redirects.
-#: includes/Admin/View.php:76
+#: includes/Admin/View.php:77
 #, php-format
 msgid "%1$s · %2$s redirect"
 msgid_plural "%1$s · %2$s redirects"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/View.php:89
-#: includes/Admin/View.php:292
+#: includes/Admin/View.php:90
+#: includes/Admin/View.php:308
 msgid "Open RedirHub"
 msgstr ""
 
-#: includes/Admin/View.php:105
+#: includes/Admin/View.php:111
 msgid "Overview"
 msgstr ""
 
-#: includes/Admin/View.php:109
+#: includes/Admin/View.php:115
 msgid "Sections"
 msgstr ""
 
-#: includes/Admin/View.php:134
+#: includes/Admin/View.php:140
 msgid "Keep your rankings when URLs change"
 msgstr ""
 
-#: includes/Admin/View.php:134
+#: includes/Admin/View.php:140
 msgid "Permanent redirects carry an old page’s search ranking to its new address, one page or a whole site at a time."
 msgstr ""
 
-#: includes/Admin/View.php:135
+#: includes/Admin/View.php:141
 msgid "Short links on your own domain"
 msgstr ""
 
-#: includes/Admin/View.php:135
+#: includes/Admin/View.php:141
 msgid "yoursite.com/spring for a flyer or a QR code. Change where it goes at any time, without reprinting."
 msgstr ""
 
-#: includes/Admin/View.php:136
+#: includes/Admin/View.php:142
 msgid "See every click"
 msgstr ""
 
-#: includes/Admin/View.php:136
+#: includes/Admin/View.php:142
 msgid "Clicks per link, where visitors come from, and the missing pages people still try to open."
 msgstr ""
 
-#: includes/Admin/View.php:137
+#: includes/Admin/View.php:143
 msgid "Nothing to change on your server"
 msgstr ""
 
-#: includes/Admin/View.php:137
+#: includes/Admin/View.php:143
 msgid "Your domain and DNS stay where they are. Redirects answer in a few milliseconds."
 msgstr ""
 
 #. translators: %s: link to the RedirHub dashboard.
-#: includes/Admin/View.php:142
+#: includes/Admin/View.php:148
 #, php-format
 msgid "In %s, add your domain and choose “Connect through your own platform”, then WordPress."
 msgstr ""
 
-#: includes/Admin/View.php:145
+#: includes/Admin/View.php:151
 msgid "Copy the two values it shows and paste them below."
 msgstr ""
 
-#: includes/Admin/View.php:146
+#: includes/Admin/View.php:152
 msgid "Connect, then press “Check now” in RedirHub. That’s it."
 msgstr ""
 
-#: includes/Admin/View.php:152
+#: includes/Admin/View.php:157
 msgid "About 2 minutes to set up"
 msgstr ""
 
-#: includes/Admin/View.php:153
+#: includes/Admin/View.php:158
 msgid "Every old link, on the right page"
 msgstr ""
 
-#: includes/Admin/View.php:154
+#: includes/Admin/View.php:159
 msgid "Pages move and links get shared for years. Send every one of those visits where it belongs, and see what your links do."
 msgstr ""
 
-#: includes/Admin/View.php:173
+#: includes/Admin/View.php:166
 msgid "Connect your domain"
 msgstr ""
 
-#: includes/Admin/View.php:187
+#: includes/Admin/View.php:180
 msgid "Connecting…"
 msgstr ""
 
-#: includes/Admin/View.php:207
+#: includes/Admin/View.php:213
 msgid "Set in wp-config.php (REDIRHUB_RULES_URL)."
 msgstr ""
 
-#: includes/Admin/View.php:210
+#: includes/Admin/View.php:216
 msgid "Leave empty to keep the address you saved. Pasting the whole setup text works too."
 msgstr ""
 
-#: includes/Admin/View.php:210
+#: includes/Admin/View.php:216
 msgid "Pasting the whole setup text works too: the address is picked out of it."
 msgstr ""
 
-#: includes/Admin/View.php:214
-#: includes/Admin/View.php:672
+#: includes/Admin/View.php:220
+#: includes/Admin/View.php:689
 msgid "Integration key"
 msgstr ""
 
-#: includes/Admin/View.php:214
+#: includes/Admin/View.php:220
 msgid "Optional, to count clicks"
 msgstr ""
 
-#: includes/Admin/View.php:217
+#: includes/Admin/View.php:223
 msgid "Set in wp-config.php (REDIRHUB_INTEGRATION_KEY)."
 msgstr ""
 
-#: includes/Admin/View.php:220
+#: includes/Admin/View.php:226
 msgid "Without it your redirects work, but their clicks are not counted. Workspace managers find it in RedirHub."
 msgstr ""
 
-#: includes/Admin/View.php:220
+#: includes/Admin/View.php:226
 msgid "Leave empty to keep the key you saved."
 msgstr ""
 
-#: includes/Admin/View.php:258
+#: includes/Admin/View.php:264
 msgid "Not downloaded"
 msgstr ""
 
 #. translators: 1: when last checked, 2: when last changed.
-#: includes/Admin/View.php:262
+#: includes/Admin/View.php:268
 #, php-format
 msgid "Checked %1$s · last updated %2$s. Changes you make in RedirHub arrive within a minute."
 msgstr ""
 
 #. translators: 1: when, 2: the error.
-#: includes/Admin/View.php:268
+#: includes/Admin/View.php:274
 #, php-format
 msgid "Couldn’t update %1$s: %2$s"
 msgstr ""
 
-#: includes/Admin/View.php:270
+#: includes/Admin/View.php:276
 msgid "Up to date"
 msgstr ""
 
-#: includes/Admin/View.php:270
+#: includes/Admin/View.php:276
 msgid "Using the last good copy"
 msgstr ""
 
+#: includes/Admin/View.php:282
+#: includes/Admin/View.php:347
+#: includes/Admin/View.php:491
+msgid "No redirects yet"
+msgstr ""
+
+#: includes/Admin/View.php:283
+msgid "Add your first redirect in RedirHub: an old page, a short link or a catch-all. It is live here within a minute."
+msgstr ""
+
+#: includes/Admin/View.php:284
+msgid "Add in RedirHub"
+msgstr ""
+
+#: includes/Admin/View.php:284
+#: includes/Admin/View.php:295
+msgid "Update now"
+msgstr ""
+
 #. translators: %s: number of redirects.
-#: includes/Admin/View.php:278
+#: includes/Admin/View.php:293
 #, php-format
 msgid "%s redirect live"
 msgid_plural "%s redirects live"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/View.php:280
-msgid "Update now"
-msgstr ""
-
 #. translators: 1: hostname, 2: when.
-#: includes/Admin/View.php:288
+#: includes/Admin/View.php:304
 #, php-format
 msgid "%1$s %2$s"
 msgstr ""
 
-#: includes/Admin/View.php:290
+#: includes/Admin/View.php:306
 msgid "Domain verified"
 msgstr ""
 
 #. translators: %s: hostnames and when they were checked.
-#: includes/Admin/View.php:290
+#: includes/Admin/View.php:306
 #, php-format
 msgid "Checked by RedirHub: %s. It keeps checking that this site runs your latest redirects."
 msgstr ""
 
 #. translators: %s: hostnames and when they were checked.
-#: includes/Admin/View.php:290
-#: includes/Admin/View.php:337
+#: includes/Admin/View.php:306
+#: includes/Admin/View.php:353
 msgid "Verified"
 msgstr ""
 
-#: includes/Admin/View.php:292
+#: includes/Admin/View.php:308
 msgid "Verify your domain"
 msgstr ""
 
-#: includes/Admin/View.php:292
+#: includes/Admin/View.php:308
 msgid "One last step: press “Check now” on your domain in RedirHub. As soon as it reaches this site, your domain is verified."
 msgstr ""
 
-#: includes/Admin/View.php:292
+#: includes/Admin/View.php:308
 msgid "Waiting"
 msgstr ""
 
-#: includes/Admin/View.php:297
-#: includes/Admin/View.php:299
-#: includes/Admin/View.php:310
-#: includes/Admin/View.php:615
+#: includes/Admin/View.php:313
+#: includes/Admin/View.php:315
+#: includes/Admin/View.php:326
+#: includes/Admin/View.php:632
 msgid "Click tracking"
 msgstr ""
 
-#: includes/Admin/View.php:297
+#: includes/Admin/View.php:313
 msgid "Add your integration key to see how often each link is clicked."
 msgstr ""
 
-#: includes/Admin/View.php:297
+#: includes/Admin/View.php:313
 msgid "Switched off in Settings."
 msgstr ""
 
-#: includes/Admin/View.php:297
+#: includes/Admin/View.php:313
 msgid "Off"
 msgstr ""
 
-#: includes/Admin/View.php:299
+#: includes/Admin/View.php:315
 msgid "Click tracking is not available for this domain."
 msgstr ""
 
-#: includes/Admin/View.php:299
+#: includes/Admin/View.php:315
 msgid "Not available"
 msgstr ""
 
-#: includes/Admin/View.php:303
+#: includes/Admin/View.php:319
 msgid "Every click on a redirect is counted. No clicks yet."
 msgstr ""
 
 #. translators: %s: when.
-#: includes/Admin/View.php:305
+#: includes/Admin/View.php:321
 #, php-format
 msgid "Last click counted %s. See them all in your RedirHub stats."
 msgstr ""
 
 #. translators: 1: when, 2: the error.
-#: includes/Admin/View.php:308
+#: includes/Admin/View.php:324
 #, php-format
 msgid "Some clicks could not be counted %1$s (%2$s)."
 msgstr ""
 
-#: includes/Admin/View.php:310
+#: includes/Admin/View.php:326
 msgid "Some missed"
 msgstr ""
 
-#: includes/Admin/View.php:310
+#: includes/Admin/View.php:326
 msgid "On"
 msgstr ""
 
-#: includes/Admin/View.php:314
+#: includes/Admin/View.php:330
 msgid "Test your redirects"
 msgstr ""
 
-#: includes/Admin/View.php:314
+#: includes/Admin/View.php:330
 msgid "Opens your domain from the outside, as a visitor would, through any cache or CDN in front of your site, and tells you what to fix."
 msgstr ""
 
-#: includes/Admin/View.php:314
+#: includes/Admin/View.php:330
 msgid "Run the test"
-msgstr ""
-
-#: includes/Admin/View.php:331
-#: includes/Admin/View.php:475
-msgid "No redirects yet"
 msgstr ""
 
 #. translators: %s: number.
 #. translators: %s: number of redirects.
-#: includes/Admin/View.php:331
-#: includes/Admin/View.php:512
+#: includes/Admin/View.php:347
+#: includes/Admin/View.php:529
 #, php-format
 msgid "%s redirect"
 msgid_plural "%s redirects"
@@ -614,316 +624,309 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number.
-#: includes/Admin/View.php:332
+#: includes/Admin/View.php:348
 msgid "Your site"
 msgstr ""
 
-#: includes/Admin/View.php:333
+#: includes/Admin/View.php:349
 msgid "Visitors"
 msgstr ""
 
-#: includes/Admin/View.php:333
+#: includes/Admin/View.php:349
 msgid "Clicks counted"
 msgstr ""
 
-#: includes/Admin/View.php:333
+#: includes/Admin/View.php:349
 msgid "Clicks not counted"
 msgstr ""
 
-#: includes/Admin/View.php:336
+#: includes/Admin/View.php:352
 msgid "In sync"
 msgstr ""
 
-#: includes/Admin/View.php:336
+#: includes/Admin/View.php:352
 msgid "Can’t update"
 msgstr ""
 
-#: includes/Admin/View.php:336
+#: includes/Admin/View.php:352
 msgid "Update failing"
 msgstr ""
 
-#: includes/Admin/View.php:337
+#: includes/Admin/View.php:353
 msgid "Not verified yet"
 msgstr ""
 
-#: includes/Admin/View.php:339
+#: includes/Admin/View.php:355
 msgid "How your redirects reach visitors"
 msgstr ""
 
-#: includes/Admin/View.php:370
+#: includes/Admin/View.php:386
 msgid "Everything works from the outside"
 msgstr ""
 
-#: includes/Admin/View.php:370
+#: includes/Admin/View.php:386
 msgid "Something is in the way"
 msgstr ""
 
-#: includes/Admin/View.php:391
+#: includes/Admin/View.php:407
 msgid "Plain permalinks are on, so the web server answers unknown addresses itself and they never reach your redirects. Choose any other structure under Settings → Permalinks."
 msgstr ""
 
 #. translators: %s: a path such as /blog/.
-#: includes/Admin/View.php:396
+#: includes/Admin/View.php:412
 #, php-format
 msgid "WordPress runs under %s: only addresses below it can be redirected, and your domain is verified at its root. Serve WordPress at the root, or connect this domain another way."
 msgstr ""
 
-#: includes/Admin/View.php:399
+#: includes/Admin/View.php:415
 msgid "This site’s address starts with http://. Your domain is verified over HTTPS, so it needs a certificate."
 msgstr ""
 
-#: includes/Admin/View.php:403
+#: includes/Admin/View.php:419
 msgid "A proxy or CDN stands in front of this site, so every visitor seems to come from its address: in your stats, and for the limit on password attempts. Choose its header under Settings → Visitor address."
 msgstr ""
 
 #. translators: %s: names of cache plugins.
-#: includes/Admin/View.php:408
+#: includes/Admin/View.php:424
 #, php-format
 msgid "Page cache found (%s). When a redirect changes, its old cached page is cleared for you. A CDN or host cache the plugin can’t reach may need clearing by hand; the test shows it."
 msgstr ""
 
-#: includes/Admin/View.php:411
+#: includes/Admin/View.php:427
 msgid "wp-content/cache can’t be written, so your redirects are kept in the database. They work; with many of them they are faster when that folder is writable."
 msgstr ""
 
-#: includes/Admin/View.php:450
+#: includes/Admin/View.php:466
 msgid "Redirects in use"
 msgstr ""
 
 #. translators: %s: link to RedirHub.
-#: includes/Admin/View.php:455
+#: includes/Admin/View.php:471
 #, php-format
 msgid "To add or change one, use %s: it is live here within a minute."
 msgstr ""
 
-#: includes/Admin/View.php:465
+#: includes/Admin/View.php:481
+#: includes/Admin/View.php:483
 msgid "Search redirects"
 msgstr ""
 
-#: includes/Admin/View.php:467
-msgid "Search paths and destinations"
-msgstr ""
-
-#: includes/Admin/View.php:469
+#: includes/Admin/View.php:485
 msgid "Search"
 msgstr ""
 
-#: includes/Admin/View.php:475
+#: includes/Admin/View.php:491
 msgid "No redirect matches your search"
 msgstr ""
 
-#: includes/Admin/View.php:476
+#: includes/Admin/View.php:492
 msgid "Add one in RedirHub and it shows up here within a minute."
 msgstr ""
 
-#: includes/Admin/View.php:476
+#: includes/Admin/View.php:492
 msgid "Try part of the old address or of the destination."
 msgstr ""
 
-#: includes/Admin/View.php:482
+#: includes/Admin/View.php:498
 msgid "From"
 msgstr ""
 
-#: includes/Admin/View.php:483
+#: includes/Admin/View.php:499
 msgid "To"
 msgstr ""
 
-#: includes/Admin/View.php:484
+#: includes/Admin/View.php:500
 msgid "Type"
 msgstr ""
 
-#: includes/Admin/View.php:485
-msgid "Options"
-msgstr ""
-
-#: includes/Admin/View.php:494
+#: includes/Admin/View.php:510
 msgid "Every address this site can’t find"
 msgstr ""
 
-#: includes/Admin/View.php:518
+#: includes/Admin/View.php:535
 msgid "Previous"
 msgstr ""
 
 #. translators: 1: page, 2: number of pages.
-#: includes/Admin/View.php:523
+#: includes/Admin/View.php:540
 #, php-format
 msgid "Page %1$s of %2$s"
 msgstr ""
 
-#: includes/Admin/View.php:527
+#: includes/Admin/View.php:544
 msgid "Next"
 msgstr ""
 
-#: includes/Admin/View.php:544
+#: includes/Admin/View.php:561
 msgid "301 · Permanent"
 msgstr ""
 
-#: includes/Admin/View.php:545
+#: includes/Admin/View.php:562
 msgid "302 · Temporary"
 msgstr ""
 
-#: includes/Admin/View.php:546
+#: includes/Admin/View.php:563
 msgid "307 · Temporary"
 msgstr ""
 
-#: includes/Admin/View.php:547
+#: includes/Admin/View.php:564
 msgid "308 · Permanent"
 msgstr ""
 
-#: includes/Admin/View.php:548
+#: includes/Admin/View.php:565
 msgid "Frame page"
 msgstr ""
 
-#: includes/Admin/View.php:563
+#: includes/Admin/View.php:580
 msgid "Keeps the path"
 msgstr ""
 
-#: includes/Admin/View.php:566
+#: includes/Admin/View.php:583
 msgid "Keeps the query"
 msgstr ""
 
-#: includes/Admin/View.php:569
+#: includes/Admin/View.php:586
 msgid "Password"
 msgstr ""
 
-#: includes/Admin/View.php:572
+#: includes/Admin/View.php:589
 msgid "Rotates in turn"
 msgstr ""
 
-#: includes/Admin/View.php:572
+#: includes/Admin/View.php:589
 msgid "Rotates at random"
 msgstr ""
 
-#: includes/Admin/View.php:576
+#: includes/Admin/View.php:593
 msgid "Blocks bots"
 msgstr ""
 
-#: includes/Admin/View.php:579
+#: includes/Admin/View.php:596
 msgid "WeChat help"
 msgstr ""
 
-#: includes/Admin/View.php:586
+#: includes/Admin/View.php:603
 msgid "Extras off"
 msgstr ""
 
-#: includes/Admin/View.php:609
+#: includes/Admin/View.php:626
 msgid "Direct connection"
 msgstr ""
 
-#: includes/Admin/View.php:609
+#: includes/Admin/View.php:626
 msgid "Right for most sites, unless a proxy or CDN stands in front."
 msgstr ""
 
-#: includes/Admin/View.php:610
+#: includes/Admin/View.php:627
 msgid "Cloudflare"
 msgstr ""
 
-#: includes/Admin/View.php:610
+#: includes/Admin/View.php:627
 msgid "The CF-Connecting-IP header Cloudflare sets."
 msgstr ""
 
-#: includes/Admin/View.php:611
+#: includes/Admin/View.php:628
 msgid "X-Real-IP"
 msgstr ""
 
-#: includes/Admin/View.php:611
+#: includes/Admin/View.php:628
 msgid "The header your own proxy sets."
 msgstr ""
 
-#: includes/Admin/View.php:612
+#: includes/Admin/View.php:629
 msgid "Another header"
 msgstr ""
 
-#: includes/Admin/View.php:612
+#: includes/Admin/View.php:629
 msgid "Only one your proxy overwrites: a visitor can send any header."
 msgstr ""
 
-#: includes/Admin/View.php:615
+#: includes/Admin/View.php:632
 msgid "Count every click on a redirect, and every missing page if you turned that on for the domain. Visitors never wait for it; no cookies."
 msgstr ""
 
-#: includes/Admin/View.php:616
+#: includes/Admin/View.php:633
 msgid "Link extras"
 msgstr ""
 
-#: includes/Admin/View.php:616
+#: includes/Admin/View.php:633
 msgid "Use the password, bot blocking, WeChat help and rotating destinations you set on a link. Off: such links go straight to their main destination."
 msgstr ""
 
-#: includes/Admin/View.php:637
+#: includes/Admin/View.php:654
 msgid "Visitor address"
 msgstr ""
 
-#: includes/Admin/View.php:638
+#: includes/Admin/View.php:655
 msgid "Where your stats take the visitor’s address from. Your own address is shown next to each source."
 msgstr ""
 
-#: includes/Admin/View.php:661
+#: includes/Admin/View.php:678
 msgid "Save settings"
 msgstr ""
 
-#: includes/Admin/View.php:669
+#: includes/Admin/View.php:686
 msgid "Connection"
 msgstr ""
 
-#: includes/Admin/View.php:672
+#: includes/Admin/View.php:689
 msgid "none"
 msgstr ""
 
-#: includes/Admin/View.php:675
+#: includes/Admin/View.php:692
 msgid "Change"
 msgstr ""
 
-#: includes/Admin/View.php:683
+#: includes/Admin/View.php:700
 msgid "Saving…"
 msgstr ""
 
-#: includes/Admin/View.php:683
+#: includes/Admin/View.php:700
 msgid "Save and update"
 msgstr ""
 
-#: includes/Admin/View.php:690
+#: includes/Admin/View.php:707
 msgid "Disconnect this site"
 msgstr ""
 
-#: includes/Admin/View.php:691
+#: includes/Admin/View.php:708
 msgid "Your redirects stop at once and every page works as before. Your redirects stay in RedirHub."
 msgstr ""
 
-#: includes/Admin/View.php:696
+#: includes/Admin/View.php:713
 msgid "Disconnect"
 msgstr ""
 
 #. translators: %s: plugin version.
-#: includes/Admin/View.php:702
+#: includes/Admin/View.php:719
 #, php-format
 msgid "RedirHub Redirects %s"
 msgstr ""
 
-#: includes/Admin/View.php:726
+#: includes/Admin/View.php:743
 msgid "Not connected"
 msgstr ""
 
-#: includes/Admin/View.php:727
+#: includes/Admin/View.php:744
 msgid "Redirects can’t update"
 msgstr ""
 
-#: includes/Admin/View.php:728
+#: includes/Admin/View.php:745
 msgid "Updates stopped"
 msgstr ""
 
-#: includes/Admin/View.php:729
+#: includes/Admin/View.php:746
 msgid "Almost done: verify your domain"
 msgstr ""
 
-#: includes/Admin/View.php:730
+#: includes/Admin/View.php:747
 msgid "Live"
 msgstr ""
 
-#: includes/Admin/View.php:777
+#: includes/Admin/View.php:794
 msgid "Dismiss"
 msgstr ""
 
-#: includes/Admin/View.php:812
+#: includes/Admin/View.php:829
 msgid "Working…"
 msgstr ""
