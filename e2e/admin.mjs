@@ -20,9 +20,23 @@ let passed = 0, failed = 0;
 
 const wp = (code) => execFileSync('docker', ['compose', 'exec', '-T', 'cli', 'wp', 'eval', code], { cwd: here }).toString();
 const post = (path) => fetch(mock + path, { method: 'POST' });
+let diagnosed = false;
 function check(what, ok) {
-  if (ok) { passed++; console.log(`  ok   ${what}`); } else { failed++; console.log(`  FAIL ${what}`); }
+  if (ok) { passed++; console.log(`  ok   ${what}`); } else { failed++; console.log(`  FAIL ${what}`); diagnose(); }
 }
+// On the first failure: where the browser is and what it shows, and a screenshot (CI uploads it).
+async function diagnose() {
+  if (diagnosed || typeof page === 'undefined') return;
+  diagnosed = true;
+  try {
+    console.log(`    at ${page.url()} — "${await page.title()}"`);
+    console.log(`    ${(await page.locator('body').innerText()).replace(/\s+/g, ' ').slice(0, 600)}`);
+    await page.screenshot({ path: join(shots, 'failure.png'), fullPage: true });
+  } catch (error) {
+    console.log(`    (no diagnosis: ${error.message})`);
+  }
+}
+process.on('uncaughtException', async (error) => { await diagnose(); console.error(error); process.exit(1); });
 
 // From scratch: not connected, the sample rules on the stand-in.
 wp('\\RedirHub\\Redirects\\Settings::update(["rules_url"=>"","key"=>"","link_options"=>true,"reports"=>true]); \\RedirHub\\Redirects\\Store::clear(); \\RedirHub\\Redirects\\State::reset();');
