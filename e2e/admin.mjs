@@ -32,6 +32,8 @@ async function diagnose() {
     console.log(`    at ${page.url()} — "${await page.title()}"`);
     console.log(`    ${(await page.locator('body').innerText()).replace(/\s+/g, ' ').slice(0, 600)}`);
     await page.screenshot({ path: join(shots, 'failure.png'), fullPage: true });
+    const run = (...args) => { try { return execFileSync('docker', ['compose', 'exec', '-T', ...args], { cwd: here, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) { return `(${e.message.split('\n')[0]})`; } };
+    console.log(`    db_version in the database ${run('cli', 'wp', 'option', 'get', 'db_version')}, the site's files ${run('wordpress', 'php', '-r', 'include "wp-includes/version.php"; echo $wp_db_version;')}, WP-CLI's ${run('cli', 'php', '-r', 'include "wp-includes/version.php"; echo $wp_db_version;')}`);
   } catch (error) {
     console.log(`    (no diagnosis: ${error.message})`);
   }
