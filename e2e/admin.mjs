@@ -48,7 +48,8 @@ await page.goto(`${site}/wp-login.php`);
 await page.fill('#user_login', 'admin');
 await page.fill('#user_pass', 'admin');
 await page.click('#wp-submit');
-await page.waitForURL(/wp-admin/);
+// The login page's own address names wp-admin (redirect_to): wait for the admin itself.
+await page.waitForURL((url) => url.pathname.startsWith('/wp-admin/'));
 
 console.log('\nNot connected');
 await page.goto(`${site}/wp-admin/plugins.php`);
