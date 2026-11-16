@@ -33,6 +33,9 @@ services:
         define( 'WP_ENVIRONMENT_TYPE', 'local' );
         define( 'WP_DEBUG_LOG', '/var/www/html/wp-content/debug.log' );
         define( 'WP_DEBUG_DISPLAY', false );
+        // A test site stays on its image's WordPress: with internet access, a fresh install would
+        // update itself mid-run (new installs take major updates) and leave the database behind.
+        define( 'AUTOMATIC_UPDATER_DISABLED', true );
     # The site's own hostnames resolve to itself, so WP-Cron's loopback and the self-test work.
     extra_hosts:
       - "promo.example.test:127.0.0.1"
