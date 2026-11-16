@@ -18,6 +18,9 @@ wp() { docker compose exec -T cli wp "$@"; }
 for _ in $(seq 1 30); do wp core is-installed >/dev/null 2>&1 || wp db check >/dev/null 2>&1 && break; sleep 2; done
 wp core install --url=http://promo.example.test --title="E2E Shop" --admin_user=admin --admin_password=admin \
   --admin_email=admin@example.test --skip-email >/dev/null
+# Some images ship core files newer than the database they install: bring it up to date, as the
+# "Update WordPress Database" button would, so the admin opens on its own screens.
+wp core update-db >/dev/null
 wp rewrite structure '/%postname%/' >/dev/null
 for slug in old-pricing exists beta; do
   wp post create --post_type=page --post_title="$slug" --post_name="$slug" --post_status=publish >/dev/null
