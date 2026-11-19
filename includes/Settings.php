@@ -24,7 +24,7 @@ final class Settings {
 	const KEY_CONSTANT       = 'REDIRHUB_INTEGRATION_KEY';
 
 	/** Where the site owner manages the redirects; a constant of that name points elsewhere (a test dashboard). */
-	const DASHBOARD          = 'https://app.redirhub.com';
+	const DASHBOARD          = 'https://dash.redirhub.com';
 	const DASHBOARD_CONSTANT = 'REDIRHUB_DASHBOARD_URL';
 
 	/** Where the visitor's address comes from: never a header a visitor can send, unless the site owner says a proxy overwrites it. */

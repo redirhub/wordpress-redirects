@@ -19,9 +19,6 @@ use RedirHub\Redirects\Core\Pages;
  */
 final class VisitorPages {
 
-	/** Where the footnote sends the link's owner. */
-	const CONSOLE = 'https://app.redirhub.com';
-
 	/**
 	 * The edge's strings (om-script redirector/internal/pages/i18n.go), by language.
 	 *
@@ -153,7 +150,7 @@ final class VisitorPages {
 			. '<button type="submit" class="btn">' . $e( $l['pw.submit'] ) . ' <svg viewBox="0 0 24 24"><path d="M5 12h12"></path><path d="M12 6l6 6-6 6"></path></svg></button></div>'
 			. ( '' === $error ? '' : '<p class="err" id="pw-err" role="alert">' . $e( $l[ $error ] ?? '' ) . '</p>' )
 			. '</form>';
-		$foot = '<a href="' . $e( self::CONSOLE . '/links' ) . '" rel="nofollow">' . $e( sprintf( $l['pw.owner'], 'RedirHub' ) ) . '</a>';
+		$foot = '<a href="' . $e( Settings::dashboard() . '/links' ) . '" rel="nofollow">' . $e( sprintf( $l['pw.owner'], 'RedirHub' ) ) . '</a>';
 
 		return '<!doctype html><html lang="' . $e( $language ) . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
 			. '<meta name="robots" content="noindex"><title>' . $e( $l['pw.title'] ) . ' · RedirHub</title><style>' . self::CSS . '</style></head>'
