@@ -79,9 +79,9 @@ if ( '/_edge/hits' === $path && 'POST' === $method ) {
 if ( 'GET /links/import' === $method . ' ' . $path ) {
 	header( 'Content-Type: text/html; charset=utf-8' );
 	echo '<!doctype html><title>Import links</title><pre id="received">waiting</pre><script>'
-		. 'window.addEventListener("message", function (e) { if (e.source !== window.opener || !e.data || e.data.type !== "redirhub:import-file") return;'
+		. 'window.addEventListener("message", function (e) { if (e.source !== window.opener || !e.data || e.data.type !== "import-handoff:file") return;'
 		. ' window.handoff = e.data; document.getElementById("received").textContent = JSON.stringify(e.data); });'
-		. 'if (window.opener) window.opener.postMessage({ type: "redirhub:import-ready" }, "*");'
+		. 'if (window.opener) window.opener.postMessage({ type: "import-handoff:ready" }, "*");'
 		. '</script>';
 	exit;
 }

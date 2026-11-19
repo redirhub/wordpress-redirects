@@ -80,12 +80,12 @@
 			}
 		};
 		var deliver = function (event) {
-			if (!tab || event.source !== tab || event.origin !== origin || !event.data || event.data.type !== 'redirhub:import-ready') {
+			if (!tab || event.source !== tab || event.origin !== origin || !event.data || event.data.type !== 'import-handoff:ready') {
 				return;
 			}
 			file.then(function (csv) {
 				tab.postMessage({
-					type: 'redirhub:import-file',
+					type: 'import-handoff:file',
 					name: form.getAttribute('data-handoff-name'),
 					from: form.getAttribute('data-handoff-from'),
 					site: window.location.host,
