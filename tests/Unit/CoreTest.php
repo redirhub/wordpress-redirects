@@ -244,4 +244,44 @@ final class CoreTest extends TestCase {
 		$this->assertSame( $rules->to_array(), include $file );
 		unlink( $file );
 	}
+
+	public function test_a_copy_split_into_buckets_reads_the_same_one_bucket_at_a_time(): void {
+		$lines = array( '@format 1', '@host shop.example.test check=t1', '@host blog.example.test check=t2' );
+		for ( $i = 0; $i < 600; $i++ ) {
+			$lines[] = "shop.example.test/old-{$i}\thttps://shop.example.test/new-{$i}\t301";
+		}
+		$lines[] = "blog.example.test/a\thttps://blog.example.test/b\t302";
+		$lines[] = "shop.example.test/*\thttps://shop.example.test/\t302";
+		$full    = \RedirHub\Redirects\Core\Parser::parse( implode( "\n", $lines ) );
+
+		list( $summary, $buckets ) = $full->split();
+		$this->assertArrayNotHasKey( 'exact', $summary['hosts']['shop.example.test'] );
+		$this->assertLessThanOrEqual( \RedirHub\Redirects\Core\RuleSet::BUCKETS, count( $buckets ) );
+		$reads = array();
+		$lazy  = \RedirHub\Redirects\Core\RuleSet::lazy(
+			$summary,
+			static function ( string $bucket ) use ( $buckets, &$reads ): array {
+				$reads[] = $bucket;
+
+				return $buckets[ $bucket ] ?? array();
+			}
+		);
+
+		$this->assertSame( 'https://shop.example.test/new-123', $lazy->exact( 'shop.example.test', '/old-123' )->target );
+		$this->assertTrue( $lazy->has_exact( 'blog.example.test', '/a' ) );
+		$this->assertNull( $lazy->exact( 'shop.example.test', '/nope' ) );
+		$this->assertSame( 'https://shop.example.test/', $lazy->catch_all( 'shop.example.test' )->target );
+		$this->assertSame( $full->count(), $lazy->count() );
+		$this->assertCount( 3, $reads, 'one bucket per lookup' );
+		$normal = static function ( array $copy ): array {
+			foreach ( $copy['hosts'] as $host => $entry ) {
+				ksort( $entry['exact'], SORT_STRING );
+				ksort( $entry );
+				$copy['hosts'][ $host ] = $entry;
+			}
+
+			return $copy;
+		};
+		$this->assertSame( $normal( $full->to_array() ), $normal( $lazy->to_array() ) );
+	}
 }

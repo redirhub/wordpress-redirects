@@ -118,10 +118,6 @@ final class SiteHealth {
 					'label' => __( 'Last error', 'redirhub-redirects' ),
 					'value' => '' === $state['error'] ? '-' : (string) $state['error'],
 				),
-				'store'      => array(
-					'label' => __( 'Copy kept in', 'redirhub-redirects' ),
-					'value' => Store::IN_OPTION === $state['file'] ? 'database' : 'file',
-				),
 				'reports'    => array(
 					'label' => __( 'Reports', 'redirhub-redirects' ),
 					'value' => Settings::reports() ? 'on' : 'off',

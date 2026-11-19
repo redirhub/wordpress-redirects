@@ -12,19 +12,22 @@ defined( 'ABSPATH' ) || exit;
 use RedirHub\Redirects\Core\RuleSet;
 
 /**
- * The parsed copy in use, written as a PHP file of one array under wp-content/cache: OPcache
- * keeps it in shared memory, so a request reads 50,000 rules as fast as five. Where that
- * directory cannot be written, the copy goes into an option (not autoloaded) instead: slower to
- * read, but it works everywhere. Each copy gets a new random file name, so OPcache never serves
- * an old copy, however it revalidates.
+ * The parsed copy in use, in the database: an option with everything but the exact paths (the
+ * hostnames, their check tokens and catch-alls), and the paths in RuleSet::BUCKETS options by
+ * the hash of host and path. A request reads the first and the one bucket its path is in, so
+ * 50,000 rules answer as fast as five. None of them is autoloaded: pages that no rule answers
+ * never read the paths.
+ *
+ * Each copy gets a new generation, written whole before the summary points at it, so a request
+ * never mixes two copies; the old generation is removed after.
  */
 final class Store {
 
-	/** The option of the fallback copy. */
+	/** The summary of the copy in use, with its generation. */
 	const OPTION = 'redirhub_redirects_copy';
 
-	/** `file` in State when the copy lives in the option. */
-	const IN_OPTION = 'option';
+	/** The options of a generation's buckets: this, the generation and the bucket. */
+	const BUCKET_PREFIX = 'redirhub_redirects_paths_';
 
 	/**
 	 * The copy loaded in this request; false before loading.
@@ -41,46 +44,61 @@ final class Store {
 			return self::$loaded;
 		}
 		self::$loaded = null;
-		$file         = State::get()['file'];
-		if ( self::IN_OPTION === $file ) {
-			$data = get_option( self::OPTION, null );
-		} elseif ( '' !== $file && preg_match( '/^rules-[a-f0-9]{32}\.php$/', $file ) && is_file( self::dir() . '/' . $file ) ) {
-			$data = include self::dir() . '/' . $file;
-		} else {
-			$data = null;
-		}
-		if ( is_array( $data ) && isset( $data['hosts'] ) ) {
-			self::$loaded = new RuleSet( $data );
+		$stored       = get_option( self::OPTION, null );
+		if ( is_array( $stored ) && isset( $stored['generation'], $stored['summary']['hosts'] ) && is_array( $stored['summary'] ) ) {
+			$generation   = (string) $stored['generation'];
+			self::$loaded = RuleSet::lazy(
+				$stored['summary'],
+				static function ( string $bucket ) use ( $generation ): array {
+					$paths = get_option( self::BUCKET_PREFIX . $generation . '_' . $bucket, array() );
+
+					return is_array( $paths ) ? $paths : array();
+				}
+			);
 		}
 
 		return self::$loaded;
 	}
 
 	/**
-	 * Keeps a new copy, and removes the one it replaces.
+	 * Keeps a new copy, in place of the last one.
 	 *
-	 * @param RuleSet $rules The new copy.
-	 * @return string Its `file` for State: a file name, or `option`.
+	 * @param RuleSet $rules The copy.
+	 * @return string Its generation (State's `file`).
 	 */
 	public static function save( RuleSet $rules ): string {
-		$previous = State::get()['file'];
-		$file     = self::write_file( $rules );
-		if ( null === $file ) {
-			update_option( self::OPTION, $rules->to_array(), false );
-			$file = self::IN_OPTION;
-		} elseif ( self::IN_OPTION === $previous ) {
-			delete_option( self::OPTION );
+		$previous   = get_option( self::OPTION, null );
+		$generation = bin2hex( random_bytes( 6 ) );
+		list( $summary, $buckets ) = $rules->split();
+		// Every bucket, empty ones too: a missing option would be remembered in `notoptions`.
+		for ( $i = 0; $i < RuleSet::BUCKETS; $i++ ) {
+			$bucket = sprintf( '%02x', $i );
+			update_option( self::BUCKET_PREFIX . $generation . '_' . $bucket, $buckets[ $bucket ] ?? array(), false );
+		}
+		update_option(
+			self::OPTION,
+			array(
+				'generation' => $generation,
+				'summary'    => $summary,
+			),
+			false
+		);
+		if ( is_array( $previous ) && isset( $previous['generation'] ) ) {
+			self::remove_generation( (string) $previous['generation'] );
 		}
 		self::$loaded = $rules;
-		self::remove_old( $file );
 
-		return $file;
+		return $generation;
 	}
 
 	/** Removes every copy (disconnecting, uninstalling). */
 	public static function clear(): void {
+		$stored = get_option( self::OPTION, null );
 		delete_option( self::OPTION );
-		self::remove_old( '' );
+		if ( is_array( $stored ) && isset( $stored['generation'] ) ) {
+			self::remove_generation( (string) $stored['generation'] );
+		}
+		self::remove_buckets( '' );
 		self::$loaded = false;
 	}
 
@@ -90,87 +108,29 @@ final class Store {
 	}
 
 	/**
-	 * The directory of the copies: one per site of a network.
+	 * Removes a generation's buckets.
+	 *
+	 * @param string $generation The generation.
 	 */
-	public static function dir(): string {
-		$dir = WP_CONTENT_DIR . '/cache/redirhub-redirects';
-		if ( is_multisite() ) {
-			$dir .= '/site-' . get_current_blog_id();
+	private static function remove_generation( string $generation ): void {
+		if ( '' === $generation ) {
+			return;
 		}
-
-		return $dir;
-	}
-
-	/** Whether copies can be kept as files (shown on the admin page). */
-	public static function writable(): bool {
-		return self::IN_OPTION !== State::get()['file'] || self::prepare_dir();
+		self::remove_buckets( $generation . '_' );
+		for ( $i = 0; $i < RuleSet::BUCKETS; $i++ ) {
+			wp_cache_delete( self::BUCKET_PREFIX . $generation . '_' . sprintf( '%02x', $i ), 'options' );
+		}
 	}
 
 	/**
-	 * Writes the copy to a new file and checks it reads back.
+	 * Removes the buckets whose names start with a prefix, in one query: a generation's 256
+	 * rows, or (empty) every generation's.
 	 *
-	 * @param RuleSet $rules The copy.
-	 * @return string|null The file name, or null where files cannot be written.
+	 * @param string $prefix After BUCKET_PREFIX.
 	 */
-	private static function write_file( RuleSet $rules ): ?string {
-		if ( ! self::prepare_dir() ) {
-			return null;
-		}
-		$name = 'rules-' . bin2hex( random_bytes( 16 ) ) . '.php';
-		$path = self::dir() . '/' . $name;
-		$tmp  = $path . '.' . getmypid() . '.tmp';
-		// Nothing downloaded stands outside var_export(), which writes every value as a quoted, escaped literal.
-		$php = "<?php\n// RedirHub Redirects: the rules in use. Generated, do not edit.\ndefined( 'ABSPATH' ) || exit;\nreturn " . var_export( $rules->to_array(), true ) . ";\n"; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
-
-		// phpcs:disable WordPress.WP.AlternativeFunctions -- WP_Filesystem may ask for FTP credentials; this is a cache file.
-		if ( false === @file_put_contents( $tmp, $php, LOCK_EX ) || ! @rename( $tmp, $path ) ) {
-			@unlink( $tmp );
-
-			return null;
-		}
-		// phpcs:enable
-		$read = include $path;
-		if ( ! is_array( $read ) || ( $read['etag'] ?? null ) !== $rules->etag() ) {
-			@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-
-			return null;
-		}
-
-		return $name;
-	}
-
-	/** Creates the directory, closed to the web, where it is missing. */
-	private static function prepare_dir(): bool {
-		$dir = self::dir();
-		if ( ! is_dir( $dir ) && ! wp_mkdir_p( $dir ) ) {
-			return false;
-		}
-		// phpcs:disable WordPress.WP.AlternativeFunctions, WordPress.PHP.NoSilencedErrors.Discouraged
-		if ( ! is_file( $dir . '/index.php' ) ) {
-			@file_put_contents( $dir . '/index.php', "<?php\n// Silence is golden.\n" );
-		}
-		if ( ! is_file( $dir . '/.htaccess' ) ) {
-			@file_put_contents( $dir . '/.htaccess', "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n\tDeny from all\n</IfModule>\n" );
-		}
-		// phpcs:enable
-
-		return wp_is_writable( $dir );
-	}
-
-	/**
-	 * Removes the copies but one.
-	 *
-	 * @param string $keep The file name to keep; empty removes all.
-	 */
-	private static function remove_old( string $keep ): void {
-		foreach ( (array) glob( self::dir() . '/rules-*.php*' ) as $path ) {
-			if ( basename( (string) $path ) !== $keep ) {
-				// Without this an old copy keeps its OPcache memory until PHP restarts.
-				if ( function_exists( 'opcache_invalidate' ) ) {
-					@opcache_invalidate( (string) $path, true ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-				}
-				@unlink( (string) $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
-			}
-		}
+	private static function remove_buckets( string $prefix ): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- one DELETE for 256 options instead of 256.
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( self::BUCKET_PREFIX . $prefix ) . '%' ) );
 	}
 }

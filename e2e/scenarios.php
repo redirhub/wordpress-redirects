@@ -126,15 +126,13 @@ list( $code ) = http( $wp, 'GET', 'https://links.example.test/fresh' );
 check( 'garbage parses to no hostnames: the site answers itself', 307 !== $code && 'updated' === ( $result->status ?? '' ) );
 connect( rules_file( $rules ) );
 
-section( 'Copy kept in the database where wp-content/cache is read-only' );
-docker( 'wordpress', 'chmod 0555 /var/www/html/wp-content/cache/redirhub-redirects && rm -f /var/www/html/wp-content/cache/redirhub-redirects/rules-*' );
+section( 'The copy is data in the database' );
 post( $mock . '/control/rules?name=links', rules_file( array_merge( $rules, array( "links.example.test/db\thttps://dest.example.test/db" ) ) ) );
-$file = trim( wp_eval( '\RedirHub\Redirects\Sync::run(true); echo \RedirHub\Redirects\State::get()["file"];' ) );
+$kept = json_decode( wp_eval( 'global $wpdb; \RedirHub\Redirects\Sync::run(true); $c = get_option("redirhub_redirects_copy"); echo json_encode(["generation" => $c["generation"] ?? "", "state" => \RedirHub\Redirects\State::get()["file"], "parts" => (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE \'redirhub\\\\_redirects\\\\_paths\\\\_%\'"), "autoload" => (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->options} WHERE (option_name LIKE \'redirhub\\\\_redirects\\\\_paths\\\\_%\' OR option_name = \'redirhub_redirects_copy\') AND autoload IN (\'yes\',\'on\',\'auto-on\')")]);' ) );
 list( $code, $head ) = http( $wp, 'GET', 'https://links.example.test/db' );
-check( 'the copy goes to the database and redirects work', 'option' === $file && 301 === $code && 'https://dest.example.test/db' === ( $head['location'] ?? '' ) );
-docker( 'wordpress', 'chmod 0777 /var/www/html/wp-content/cache/redirhub-redirects' );
-$file = trim( wp_eval( '\RedirHub\Redirects\State::update(["etag"=>""]); \RedirHub\Redirects\Sync::run(true); echo \RedirHub\Redirects\State::get()["file"], " ", get_option("redirhub_redirects_copy") ? "copy-left" : "copy-gone";' ) );
-check( 'back to a file once writable, and the database copy is removed', 1 === preg_match( '/^rules-[a-f0-9]{32}\.php copy-gone$/', $file ) );
+check( 'a new copy is a generation of 256 parts, none autoloaded, and redirects work', 1 === preg_match( '/^[a-f0-9]{12}$/', $kept->generation ?? '' ) && ( $kept->state ?? '' ) === ( $kept->generation ?? '-' ) && 256 === ( $kept->parts ?? 0 ) && 0 === ( $kept->autoload ?? 1 ) && 301 === $code && 'https://dest.example.test/db' === ( $head['location'] ?? '' ) );
+$files = trim( docker( 'wordpress', 'find /var/www/html/wp-content -path "*redirhub-redirects*" -not -path "*/plugins/*" | wc -l' ) );
+check( 'nothing is written to the file system', '0' === $files );
 
 section( 'Scale: 50,000 rules' );
 $many = array();
@@ -153,8 +151,6 @@ printf( "    median time to first byte: redirect with 50,000 rules %.1f ms, a Wo
 check( 'a redirect answers faster than a WordPress page', $redirect < $page );
 
 section( 'Hardening' );
-$out = wp_eval( '$r = new \RedirHub\Redirects\Core\RuleSet(["etag" => "a\rprint(\"PWNED\");//", "hosts" => []]); $f = \RedirHub\Redirects\Store::save($r); ob_start(); include \RedirHub\Redirects\Store::dir() . "/" . $f; echo ob_get_clean() === "" ? "inert" : "EXECUTED";' );
-check( 'a hostile ETag in the cache file stays inert', 'inert' === trim( $out ) );
 connect( rules_file( $rules ) );
 wp_eval( 'global $wpdb; $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE \'%redirhub_pw_%\'");' );
 list( $code, $head ) = http( $wp, 'POST', 'https://links.example.test//vault', array( 'Content-Type' => 'application/x-www-form-urlencoded' ), 'password=' . rawurlencode( 'open sesame' ) );
@@ -162,8 +158,8 @@ check( 'unlocking never sends a protocol-relative Location (' . ( $head['locatio
 $runs = shell_exec( 'cd ' . escapeshellarg( __DIR__ ) . ' && for i in 1 2 3 4; do docker compose exec -T cli wp eval \'\RedirHub\Redirects\State::update(["fetched_at"=>0]); echo \RedirHub\Redirects\Sync::run()["status"], "\n";\' 2>/dev/null & done; wait' );
 $statuses = array_count_values( array_filter( array_map( 'trim', explode( "\n", (string) $runs ) ) ) );
 check( 'concurrent downloads: one at a time (' . json_encode( $statuses ) . ')', ( $statuses['updated'] ?? 0 ) + ( $statuses['unchanged'] ?? 0 ) >= 1 && array_sum( $statuses ) === 4 );
-$file = trim( wp_eval( '$f = \RedirHub\Redirects\State::get()["file"]; echo is_file(\RedirHub\Redirects\Store::dir() . "/" . $f) ? "present" : "missing";' ) );
-check( 'and the copy in use is on disk afterwards', 'present' === $file );
+$left = json_decode( wp_eval( 'global $wpdb; $c = get_option("redirhub_redirects_copy"); echo json_encode(["generations" => (int) $wpdb->get_var("SELECT COUNT(DISTINCT SUBSTRING(option_name, 1, 38)) FROM {$wpdb->options} WHERE option_name LIKE \'redirhub\\\\_redirects\\\\_paths\\\\_%\'"), "current" => (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s", "redirhub\\_redirects\\_paths\\_" . ($c["generation"] ?? "-") . "\\_%"))]);' ) );
+check( 'and only the copy in use is kept, whole (' . json_encode( $left ) . ')', 1 === ( $left->generations ?? 0 ) && 256 === ( $left->current ?? 0 ) );
 
 section( 'Password-protected catch-all' );
 connect( rules_file( $rules, 'links.example.test', "@host vault.example.test check=FAKEvlt\nvault.example.test/*\thttps://dest.example.test/v/\t302\tp\tpassword={$hash}\n" ) );
@@ -186,7 +182,7 @@ check( 'the disconnect action refuses a request without a nonce', 301 === $code 
 wp_eval( '\RedirHub\Redirects\Settings::update(["rules_url"=>"","key"=>""]); \RedirHub\Redirects\Store::clear(); \RedirHub\Redirects\State::reset();' );
 list( $code ) = http( $wp, 'GET', 'https://links.example.test/old' );
 check( 'disconnected, the site answers every path itself', 404 === $code );
-$left = trim( docker( 'wordpress', 'ls /var/www/html/wp-content/cache/redirhub-redirects/ | grep -c rules- || true' ) );
+$left = trim( wp_eval( 'global $wpdb; echo (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE \'redirhub\\\\_redirects\\\\_paths\\\\_%\' OR option_name = \'redirhub_redirects_copy\'");' ) );
 check( 'no copy is left behind', '0' === $left );
 
 finish();

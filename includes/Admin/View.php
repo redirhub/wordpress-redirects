@@ -530,9 +530,6 @@ final class View {
 			/* translators: %s: names of cache plugins. */
 			$notes[] = array( 'info', sprintf( __( 'Page cache found (%s). When a redirect changes, its old cached page is cleared for you. A CDN or host cache the plugin can’t reach may need clearing by hand; the test shows it.', 'redirhub-redirects' ), implode( ', ', $caches ) ) );
 		}
-		if ( Store::IN_OPTION === State::get()['file'] ) {
-			$notes[] = array( 'info', __( 'wp-content/cache can’t be written, so your redirects are kept in the database. They work; with many of them they are faster when that folder is writable.', 'redirhub-redirects' ) );
-		}
 
 		return $notes;
 	}

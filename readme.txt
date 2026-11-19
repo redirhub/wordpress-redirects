@@ -24,7 +24,7 @@ RedirHub Redirects makes sure they do, without touching your server, your hostin
 * **Short links on your own domain.** `yoursite.com/spring` for a campaign, a QR code or a flyer. Change where it goes at any time, without reprinting anything.
 * **Links that do more.** Protect a link with a password, split visitors between several destinations, keep bots away from a link, or help WeChat users open it in their browser.
 * **Bring your redirects with you.** Already use Redirection, Rank Math, Yoast SEO Premium, All in One SEO, SEOPress, Safe Redirect Manager, Simple 301 Redirects or 301 Redirects? The plugin finds their redirects and sends them to RedirHub in one click, where you check them before anything changes.
-* **Fast.** Redirects are answered before your theme loads: about 5 ms, even with 50,000 of them, against 40 ms or more for a normal page.
+* **Fast.** Redirects are answered before your theme loads: about 6 ms, even with 50,000 of them, against 40 ms or more for a normal page.
 * **Safe.** Only the addresses you set up are redirected. If anything goes wrong, your site behaves as if the plugin were not there, and your redirects keep working with the last good copy.
 * **Works with your cache.** When a redirect changes, the plugin clears the affected pages in WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, Cache Enabler, SiteGround Optimizer and more, so an old cached page never gets in the way.
 * **You always know it works.** One click tests your redirects from the outside, the way a visitor reaches them, through any cache or CDN. Problems show up on the plugin's page, as an admin notice and in Site Health.
@@ -43,7 +43,7 @@ This plugin connects your site to RedirHub, a service run by RedirHub:
 * With the integration key, it reports each redirect (and, where your domain asks for it, each "not found" page) to RedirHub's analytics: the visitor's IP address, the time, the address requested, the status, the referrer and the browser's User-Agent. No cookies or other data are sent. You can switch reports off under Tools → RedirHub.
 * RedirHub calls your site's check path (`/_redirhub/check`) to confirm the domain is yours and serves its latest rules.
 
-RedirHub's [terms of service](https://www.redirhub.com/terms) and [privacy policy](https://www.redirhub.com/privacy) apply.
+RedirHub's [terms of service](https://www.redirhub.com/legal/terms-of-service) and [privacy policy](https://www.redirhub.com/legal/privacy-policy) apply.
 
 == Installation ==
 
@@ -78,7 +78,7 @@ Multisite: yes, each site connects its own domain. WordPress in a subdirectory: 
 
 = Where are the rules kept? =
 
-In `wp-content/cache/redirhub-redirects`, as a PHP file closed to the web, or in the database where that directory cannot be written.
+In the database, as options that are not autoloaded: a short summary and the redirects split into parts, so a visit reads only the part its address is in. Nothing is written to the file system.
 
 = What happens if RedirHub is down? =
 

@@ -33,10 +33,9 @@ WordPress.org listing.
 | The catch-all | `template_redirect`, last, only when WordPress answers 404 | its redirect |
 | The site's 404 | `shutdown`, for hostnames with `report404` | reported |
 
-- **Fast.** The parsed rules are written as a PHP array to `wp-content/cache/redirhub-redirects/`,
-  which OPcache keeps in shared memory: with 50,000 rules a redirect answers in about 5 ms, a
-  WordPress page in about 40 ms (e2e, Docker on one machine). Where that directory cannot be
-  written, the copy goes into an option instead.
+- **Fast.** The parsed rules are kept as data in options that are not autoloaded: a summary
+  (hostnames, check tokens, catch-alls) and the exact paths in 256 parts by hash, so a request
+  reads the summary and the one part its path is in. Nothing is written to the file system.
 - **Fails open.** Only GET and HEAD on listed hostnames are touched; any error leaves the request
   to WordPress; a failed download keeps the last good copy.
 - **Nobody waits.** Downloads (every `@refresh` seconds, never per request) and reports run after the
