@@ -87,8 +87,7 @@
 				tab.postMessage({
 					type: 'import-handoff:file',
 					name: form.getAttribute('data-handoff-name'),
-					from: form.getAttribute('data-handoff-from'),
-					site: window.location.host,
+					source: form.getAttribute('data-handoff-source'),
 					csv: csv
 				}, origin);
 				say(strings.handoffSent);

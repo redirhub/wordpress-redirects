@@ -46,14 +46,12 @@ console.log('\nWhat other plugins keep');
 await page.goto(page_);
 const card = page.locator('.rh-import');
 check('the page shows the redirects other plugins keep', await card.isVisible());
-const ready = async (id) => (await card.locator(`[data-import-source="${id}"]`).innerText()).replace(/\s+/g, ' ');
-check('Redirection: 2 ready; pattern, switched off, conditions and the 410 left out', /2 redirects ready/.test(await ready('redirection')) && /1 pattern.*1 error page.*1 with conditions.*1 switched off/.test(await ready('redirection')), await ready('redirection'));
-check('Rank Math: every exact source, the "starts with" one left out', /3 redirects ready/.test(await ready('rank-math')) && /1 pattern/.test(await ready('rank-math')));
-check('Yoast SEO Premium: the plain one; the regex and the 410 left out', /1 redirect ready/.test(await ready('yoast')) && /1 pattern.*1 error page/.test(await ready('yoast')));
-check('Safe Redirect Manager and Simple 301 Redirects too', /1 redirect ready/.test(await ready('safe-redirect-manager')) && /1 redirect ready/.test(await ready('simple-301-redirects')));
-check('a source another plugin already lists is counted once', /1 already listed/.test(await ready('simple-301-redirects')));
+const row = async (id) => (await card.locator(`[data-import-source="${id}"]`).innerText()).replace(/\s+/g, ' ');
+check('each plugin with how many of its redirects are ready', /Redirection 2 redirects ready/.test(await row('redirection')) && /Rank Math 3 redirects ready/.test(await row('rank-math')) && /Yoast SEO Premium 1 redirect ready/.test(await row('yoast')) && /Safe Redirect Manager 1 redirect ready/.test(await row('safe-redirect-manager')) && /Simple 301 Redirects 1 redirect ready/.test(await row('simple-301-redirects')), await row('redirection'));
+const leftOut = (await card.locator('[data-import-left-out]').innerText()).replace(/\s+/g, ' ');
+check('one line says what is left out, over all of them', leftOut === 'Left out: 5 patterns (regex or wildcard), 2 error pages (410, 404…), 1 with conditions, 1 switched off, 1 already listed. Add those in RedirHub.', leftOut);
 check('one button imports all of them', (await card.getByRole('button', { name: 'Import 8 redirects into RedirHub' }).count()) === 1);
-check('it says to switch the old plugins off afterwards', /deactivate Redirection, Rank Math/.test(await card.innerText()));
+check('it says to switch the old plugins off afterwards', /Once they are imported, switch the old plugins off\./.test(await card.innerText()));
 await card.screenshot({ path: join(shots, 'import-card.png') });
 
 console.log('\nThe import file');
@@ -70,7 +68,7 @@ check('the dashboard\'s import opens in a new tab, asking for the hand-off', new
 await tab.waitForFunction(() => window.handoff, null, { timeout: 15000 });
 const received = await tab.evaluate(() => window.handoff);
 check('once it is ready it gets the file', received.csv === expected);
-check('with its name, the plugins and the site', /^redirects-promo\.example\.test-/.test(received.name) && /^Redirection, Rank Math/.test(received.from) && received.site === 'promo.example.test', JSON.stringify({ name: received.name, from: received.from, site: received.site }));
+check('with its name and where it comes from', /^redirects-promo\.example\.test-/.test(received.name) && received.source === 'WordPress · promo.example.test', JSON.stringify({ name: received.name, source: received.source }));
 await page.locator('[data-handoff-status]').filter({ hasText: 'Sent to RedirHub' }).waitFor({ timeout: 5000 }).then(() => check('the page says it was sent and nothing changes until Import is pressed there', true), () => check('the page says it was sent', false));
 check('no script errors', errors.length === 0, errors.join('; '));
 

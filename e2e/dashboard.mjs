@@ -52,14 +52,16 @@ await tab.waitForLoadState();
 check('"Import into RedirHub" opens the dashboard\'s import', tab.url().startsWith('https://app.redirhub.test/links/import'), tab.url());
 
 const notice = tab.getByTestId('import-handoff');
-await notice.filter({ hasText: 'Redirects from promo.example.test' }).waitFor({ timeout: 60_000 });
-check('the dashboard says where they came from', /Sent by your WordPress site, from Redirection, Rank Math, Yoast SEO Premium, Safe Redirect Manager, Simple 301 Redirects/.test(await notice.innerText()));
+await notice.filter({ hasText: 'From WordPress · promo.example.test' }).waitFor({ timeout: 60_000 });
+check('the dashboard says where they came from, in one line', (await notice.innerText()).trim() === 'From WordPress · promo.example.test. Nothing changes until you import.', await notice.innerText());
 await page.locator('[data-handoff-status]').filter({ hasText: 'Sent to RedirHub' }).waitFor({ timeout: 10_000 }).then(() => check('WordPress says they were sent', true), () => check('WordPress says they were sent', false));
 
 const commit = tab.getByRole('button', { name: /^Import \d+ changes$/ });
 await commit.waitFor({ timeout: 60_000 });
 check('the dashboard opened an import ticket for them', /[?&]ticket=/.test(tab.url()), tab.url());
 check('the review counts 8 changes', (await commit.innerText()).trim() === 'Import 8 changes', await commit.innerText());
+const preview = tab.getByTestId('redirect-import-preview');
+check('and shows the links themselves: the first 5, then how many more', (await preview.getByRole('listitem').count()) === 5 && /\+ 3 more/.test(await preview.innerText()) && /promo\.example\.test\/old-about\/\s*→\s*http:\/\/promo\.example\.test(:\d+)?\/about-us\/\s*301/.test(await preview.innerText()), await preview.innerText());
 check('nothing is written before Import is pressed', links().length === 0);
 await tab.screenshot({ path: join(shots, 'dashboard-import-review.png'), fullPage: true });
 

@@ -75,11 +75,13 @@ final class View {
 		if ( array() === $found ) {
 			return;
 		}
-		$ready = 0;
-		$names = array();
+		$ready   = 0;
+		$skipped = array();
 		foreach ( $found as $plugin ) {
-			$ready  += count( $plugin['rows'] );
-			$names[] = $plugin['name'];
+			$ready += count( $plugin['rows'] );
+			foreach ( $plugin['skipped'] as $reason => $count ) {
+				$skipped[ $reason ] = ( $skipped[ $reason ] ?? 0 ) + $count;
+			}
 		}
 		$import = add_query_arg( 'handoff', 'wordpress', Settings::dashboard() . '/links/import' );
 		?>
@@ -93,7 +95,7 @@ final class View {
 						echo esc_html(
 							0 === $ready
 								? __( 'Other plugins keep redirects on this site, but none of them is one RedirHub can serve as it is.', 'redirhub-redirects' )
-								: __( 'Keep every old address working in one place. One click sends them to RedirHub, where you check them before anything changes.', 'redirhub-redirects' )
+								: __( 'Keep every old address working in one place: one click sends them to RedirHub to review and import.', 'redirhub-redirects' )
 						);
 						?>
 					</p>
@@ -103,7 +105,6 @@ final class View {
 				<?php foreach ( $found as $id => $plugin ) : ?>
 					<li class="rh:flex rh:flex-wrap rh:items-center rh:gap-x-3 rh:gap-y-1 rh:px-5 rh:py-3" data-import-source="<?php echo esc_attr( $id ); ?>">
 						<span class="rh:min-w-0 rh:flex-1 rh:text-sm rh:font-medium rh:text-foreground"><?php echo esc_html( $plugin['name'] ); ?></span>
-						<span class="rh:text-[13px] rh:text-muted-foreground"><?php echo esc_html( self::skipped_text( $plugin['skipped'] ) ); ?></span>
 						<?php
 						/* translators: %s: number of redirects. */
 						$label = sprintf( _n( '%s redirect ready', '%s redirects ready', count( $plugin['rows'] ), 'redirhub-redirects' ), number_format_i18n( count( $plugin['rows'] ) ) );
@@ -112,8 +113,11 @@ final class View {
 					</li>
 				<?php endforeach; ?>
 			</ul>
+			<?php if ( '' !== self::skipped_text( $skipped ) ) : ?>
+				<p class="rh:border-t rh:border-border rh:px-5 rh:py-2.5 rh:text-[13px] rh:text-muted-foreground" data-import-left-out><?php echo esc_html( self::skipped_text( $skipped ) . ' ' . __( 'Add those in RedirHub.', 'redirhub-redirects' ) ); ?></p>
+			<?php endif; ?>
 			<?php if ( $ready > 0 ) : ?>
-				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="rh:m-0 rh:flex rh:flex-col rh:gap-3 rh:border-t rh:border-border rh:bg-background rh:px-5 rh:py-4" data-handoff="<?php echo esc_url( $import ); ?>" data-handoff-name="<?php echo esc_attr( Page::export_name() ); ?>" data-handoff-from="<?php echo esc_attr( implode( ', ', $names ) ); ?>">
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="rh:m-0 rh:flex rh:flex-col rh:gap-3 rh:border-t rh:border-border rh:bg-background rh:px-5 rh:py-4" data-handoff="<?php echo esc_url( $import ); ?>" data-handoff-name="<?php echo esc_attr( Page::export_name() ); ?>" data-handoff-source="<?php echo esc_attr( 'WordPress · ' . wp_parse_url( home_url(), PHP_URL_HOST ) ); ?>">
 					<input type="hidden" name="action" value="redirhub_export">
 					<?php wp_nonce_field( 'redirhub_export' ); ?>
 					<div class="rh:flex rh:flex-wrap rh:items-center rh:gap-2">
@@ -126,12 +130,7 @@ final class View {
 						</button>
 						<button type="submit" class="<?php echo esc_attr( self::BUTTON_SECONDARY ); ?>"><?php echo Icons::svg( 'download', 'rh:size-4 rh:text-muted-foreground' ); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */ ?><?php esc_html_e( 'Download CSV', 'redirhub-redirects' ); ?></button>
 					</div>
-					<p data-handoff-status role="status" aria-live="polite" class="rh:text-[13px] rh:leading-relaxed rh:text-muted-foreground">
-						<?php
-						/* translators: %s: names of other plugins. */
-						echo esc_html( sprintf( __( 'RedirHub opens in a new tab with them ready to review. Once they are imported, deactivate %s so two plugins don’t answer the same addresses.', 'redirhub-redirects' ), implode( ', ', $names ) ) );
-						?>
-					</p>
+					<p data-handoff-status role="status" aria-live="polite" class="rh:text-[13px] rh:leading-relaxed rh:text-muted-foreground"><?php esc_html_e( 'Once they are imported, switch the old plugins off.', 'redirhub-redirects' ); ?></p>
 				</form>
 			<?php endif; ?>
 		</section>
@@ -166,7 +165,7 @@ final class View {
 		}
 
 		/* translators: %s: what is left out, e.g. "2 patterns (regex or wildcard), 1 switched off". */
-		return array() === $parts ? '' : sprintf( __( 'Left out: %s', 'redirhub-redirects' ), implode( ', ', $parts ) );
+		return array() === $parts ? '' : sprintf( __( 'Left out: %s.', 'redirhub-redirects' ), implode( ', ', $parts ) );
 	}
 
 	/* ------------------------------------------------------------------ chrome */
