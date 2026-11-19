@@ -23,6 +23,7 @@ RedirHub Redirects makes sure they do, without touching your server, your hostin
 * **See what your links do.** Clicks per link, where visitors came from, their country and browser. Plus the "not found" pages people still try to open, so you know exactly which redirect is missing.
 * **Short links on your own domain.** `yoursite.com/spring` for a campaign, a QR code or a flyer. Change where it goes at any time, without reprinting anything.
 * **Links that do more.** Protect a link with a password, split visitors between several destinations, keep bots away from a link, or help WeChat users open it in their browser.
+* **Bring your redirects with you.** Already use Redirection, Rank Math, Yoast SEO Premium, All in One SEO, SEOPress, Safe Redirect Manager, Simple 301 Redirects or 301 Redirects? The plugin finds their redirects and sends them to RedirHub in one click, where you check them before anything changes.
 * **Fast.** Redirects are answered before your theme loads: about 5 ms, even with 50,000 of them, against 40 ms or more for a normal page.
 * **Safe.** Only the addresses you set up are redirected. If anything goes wrong, your site behaves as if the plugin were not there, and your redirects keep working with the last good copy.
 * **Works with your cache.** When a redirect changes, the plugin clears the affected pages in WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, Cache Enabler, SiteGround Optimizer and more, so an old cached page never gets in the way.
@@ -83,6 +84,10 @@ In `wp-content/cache/redirhub-redirects`, as a PHP file closed to the web, or in
 
 Your site keeps redirecting with the last rules it downloaded and tries again every 30 seconds. After a while the admin page, an admin notice and Site Health tell you downloads are failing.
 
+= Can I bring the redirects of another redirect plugin? =
+
+Yes. Tools → RedirHub lists the redirects that Redirection, Rank Math, Yoast SEO Premium, All in One SEO, SEOPress, Safe Redirect Manager, Simple 301 Redirects and 301 Redirects keep on your site, even when that plugin is switched off. "Import into RedirHub" opens RedirHub's import with them, ready to review; nothing changes until you press Import there. You can also download them as a CSV. Regex and wildcard patterns, redirects with conditions (login, referrer…) and error pages (410) are listed but not moved: add those in RedirHub. Once they are imported, deactivate the old plugin.
+
 = Can I turn a part off? =
 
 Analytics reports and link options (passwords, bot and WeChat blocking, rotating destinations) each have a switch under Tools → RedirHub. To stop the plugin answering anything in an emergency, define `REDIRHUB_REDIRECTS_DISABLE` as `true` in `wp-config.php`.
@@ -96,7 +101,7 @@ Analytics reports and link options (passwords, bot and WeChat blocking, rotating
 == Changelog ==
 
 = 1.0.0 =
-* First release: rules file format v1 (redirects, frame pages, catch-alls, `p` and `q`), link options (passwords, rotation, bot and WeChat blocking), analytics reports, page cache purging, admin page, Site Health test.
+* First release: rules file format v1 (redirects, frame pages, catch-alls, `p` and `q`), link options (passwords, rotation, bot and WeChat blocking), analytics reports, page cache purging, admin page, Site Health test, and a one-click import of the redirects of other redirect plugins.
 
 == Upgrade Notice ==
 

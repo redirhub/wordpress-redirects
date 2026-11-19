@@ -12,6 +12,8 @@ defined( 'ABSPATH' ) || exit;
 use RedirHub\Redirects\Compat;
 use RedirHub\Redirects\Core\Path;
 use RedirHub\Redirects\Core\RuleSet;
+use RedirHub\Redirects\Import\Converter;
+use RedirHub\Redirects\Import\Sources;
 use RedirHub\Redirects\Settings;
 use RedirHub\Redirects\State;
 use RedirHub\Redirects\Store;
@@ -58,7 +60,113 @@ final class View {
 				self::overview( $level, $rules, (array) ( $flash['test'] ?? array() ) );
 			}
 		}
+		if ( 'settings' !== $tab || Status::OFF === $level ) {
+			self::import_card();
+		}
 		echo '</div></div>';
+	}
+
+	/**
+	 * Redirects other plugins keep on this site, and the way to move them: handed to the
+	 * dashboard's import (admin.js), or downloaded as its import file. Nothing shows without any.
+	 */
+	private static function import_card(): void {
+		$found = Sources::found();
+		if ( array() === $found ) {
+			return;
+		}
+		$ready = 0;
+		$names = array();
+		foreach ( $found as $plugin ) {
+			$ready  += count( $plugin['rows'] );
+			$names[] = $plugin['name'];
+		}
+		$import = add_query_arg( 'handoff', 'wordpress', Settings::dashboard() . '/links/import' );
+		?>
+		<section class="rh-import rh:overflow-hidden rh:rounded-xl rh:border rh:border-border rh:bg-card rh:shadow-card" aria-labelledby="rh-import-title">
+			<div class="rh:flex rh:gap-3 rh:border-b rh:border-border rh:px-5 rh:py-4">
+				<span class="rh:flex rh:size-9 rh:flex-none rh:items-center rh:justify-center rh:rounded-lg rh:bg-accent rh:text-accent-foreground"><?php echo Icons::svg( 'import' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<div class="rh:min-w-0">
+					<h2 id="rh-import-title" class="rh:text-base rh:font-semibold rh:text-foreground"><?php esc_html_e( 'Bring over the redirects of your other plugins', 'redirhub-redirects' ); ?></h2>
+					<p class="rh:mt-0.5 rh:text-[13px] rh:leading-relaxed rh:text-muted-foreground">
+						<?php
+						echo esc_html(
+							0 === $ready
+								? __( 'Other plugins keep redirects on this site, but none of them is one RedirHub can serve as it is.', 'redirhub-redirects' )
+								: __( 'Keep every old address working in one place. One click sends them to RedirHub, where you check them before anything changes.', 'redirhub-redirects' )
+						);
+						?>
+					</p>
+				</div>
+			</div>
+			<ul class="rh:divide-y rh:divide-border">
+				<?php foreach ( $found as $id => $plugin ) : ?>
+					<li class="rh:flex rh:flex-wrap rh:items-center rh:gap-x-3 rh:gap-y-1 rh:px-5 rh:py-3" data-import-source="<?php echo esc_attr( $id ); ?>">
+						<span class="rh:min-w-0 rh:flex-1 rh:text-sm rh:font-medium rh:text-foreground"><?php echo esc_html( $plugin['name'] ); ?></span>
+						<span class="rh:text-[13px] rh:text-muted-foreground"><?php echo esc_html( self::skipped_text( $plugin['skipped'] ) ); ?></span>
+						<?php
+						/* translators: %s: number of redirects. */
+						$label = sprintf( _n( '%s redirect ready', '%s redirects ready', count( $plugin['rows'] ), 'redirhub-redirects' ), number_format_i18n( count( $plugin['rows'] ) ) );
+						echo self::badge( 0 === count( $plugin['rows'] ) ? 'neutral' : 'info', $label ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in badge().
+						?>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+			<?php if ( $ready > 0 ) : ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="rh:m-0 rh:flex rh:flex-col rh:gap-3 rh:border-t rh:border-border rh:bg-background rh:px-5 rh:py-4" data-handoff="<?php echo esc_url( $import ); ?>" data-handoff-name="<?php echo esc_attr( Page::export_name() ); ?>" data-handoff-from="<?php echo esc_attr( implode( ', ', $names ) ); ?>">
+					<input type="hidden" name="action" value="redirhub_export">
+					<?php wp_nonce_field( 'redirhub_export' ); ?>
+					<div class="rh:flex rh:flex-wrap rh:items-center rh:gap-2">
+						<button type="button" data-handoff-start class="<?php echo esc_attr( self::BUTTON_PRIMARY ); ?>">
+							<?php
+							/* translators: %s: number of redirects. */
+							echo esc_html( sprintf( _n( 'Import %s redirect into RedirHub', 'Import %s redirects into RedirHub', $ready, 'redirhub-redirects' ), number_format_i18n( $ready ) ) );
+							echo Icons::svg( 'arrow-up-right', 'rh:size-4' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							?>
+						</button>
+						<button type="submit" class="<?php echo esc_attr( self::BUTTON_SECONDARY ); ?>"><?php echo Icons::svg( 'download', 'rh:size-4 rh:text-muted-foreground' ); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */ ?><?php esc_html_e( 'Download CSV', 'redirhub-redirects' ); ?></button>
+					</div>
+					<p data-handoff-status role="status" aria-live="polite" class="rh:text-[13px] rh:leading-relaxed rh:text-muted-foreground">
+						<?php
+						/* translators: %s: names of other plugins. */
+						echo esc_html( sprintf( __( 'RedirHub opens in a new tab with them ready to review. Once they are imported, deactivate %s so two plugins don’t answer the same addresses.', 'redirhub-redirects' ), implode( ', ', $names ) ) );
+						?>
+					</p>
+				</form>
+			<?php endif; ?>
+		</section>
+		<?php
+	}
+
+	/**
+	 * What of a plugin's redirects stays behind, in words; empty when everything moves.
+	 *
+	 * @param array<string, int> $skipped Converter's counts by reason.
+	 */
+	private static function skipped_text( array $skipped ): string {
+		$labels = array(
+			/* translators: %s: number of redirects. */
+			Converter::PATTERN   => _n_noop( '%s pattern (regex or wildcard)', '%s patterns (regex or wildcard)', 'redirhub-redirects' ),
+			/* translators: %s: number of redirects. */
+			Converter::TYPE      => _n_noop( '%s error page (410, 404…)', '%s error pages (410, 404…)', 'redirhub-redirects' ),
+			/* translators: %s: number of redirects. */
+			Converter::CONDITION => _n_noop( '%s with conditions', '%s with conditions', 'redirhub-redirects' ),
+			/* translators: %s: number of redirects. */
+			Converter::DISABLED  => _n_noop( '%s switched off', '%s switched off', 'redirhub-redirects' ),
+			/* translators: %s: number of redirects. */
+			Converter::DUPLICATE => _n_noop( '%s already listed', '%s already listed', 'redirhub-redirects' ),
+			/* translators: %s: number of redirects. */
+			Converter::INVALID   => _n_noop( '%s incomplete', '%s incomplete', 'redirhub-redirects' ),
+		);
+		$parts = array();
+		foreach ( $labels as $reason => $label ) {
+			if ( ! empty( $skipped[ $reason ] ) ) {
+				$parts[] = sprintf( translate_nooped_plural( $label, $skipped[ $reason ], 'redirhub-redirects' ), number_format_i18n( $skipped[ $reason ] ) );
+			}
+		}
+
+		/* translators: %s: what is left out, e.g. "2 patterns (regex or wildcard), 1 switched off". */
+		return array() === $parts ? '' : sprintf( __( 'Left out: %s', 'redirhub-redirects' ), implode( ', ', $parts ) );
 	}
 
 	/* ------------------------------------------------------------------ chrome */
@@ -86,7 +194,7 @@ final class View {
 					</div>
 					<p class="rh:mt-0.5 rh:truncate rh:text-sm rh:text-muted-foreground"><?php echo esc_html( $subtitle ); ?></p>
 				</div>
-				<a href="<?php echo esc_url( Page::DASHBOARD ); ?>" target="_blank" rel="noopener" class="<?php echo esc_attr( self::BUTTON_SECONDARY . ' rh:max-sm:hidden' ); ?>">
+				<a href="<?php echo esc_url( Settings::dashboard() ); ?>" target="_blank" rel="noopener" class="<?php echo esc_attr( self::BUTTON_SECONDARY . ' rh:max-sm:hidden' ); ?>">
 					<?php esc_html_e( 'Open RedirHub', 'redirhub-redirects' ); ?>
 					<?php echo Icons::svg( 'arrow-up-right', 'rh:size-4 rh:text-muted-foreground' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</a>
@@ -146,7 +254,7 @@ final class View {
 			sprintf(
 				/* translators: %s: link to the RedirHub dashboard. */
 				esc_html__( 'In %s, add your domain and choose “Connect through your own platform”, then WordPress.', 'redirhub-redirects' ),
-				'<a class="rh:font-medium rh:text-primary-hover rh:hover:underline" href="' . esc_url( Page::DASHBOARD ) . '" target="_blank" rel="noopener">' . esc_html__( 'RedirHub', 'redirhub-redirects' ) . '</a>'
+				'<a class="rh:font-medium rh:text-primary-hover rh:hover:underline" href="' . esc_url( Settings::dashboard() ) . '" target="_blank" rel="noopener">' . esc_html__( 'RedirHub', 'redirhub-redirects' ) . '</a>'
 			),
 			esc_html__( 'Copy the two values it shows and paste them below.', 'redirhub-redirects' ),
 			esc_html__( 'Connect, then press “Check now” in RedirHub. That’s it.', 'redirhub-redirects' ),
@@ -281,7 +389,7 @@ final class View {
 				'route',
 				__( 'No redirects yet', 'redirhub-redirects' ) . '<span data-rules-count="0"></span>',
 				__( 'Add your first redirect in RedirHub: an old page, a short link or a catch-all. It is live here within a minute.', 'redirhub-redirects' ),
-				self::link_button( Page::DASHBOARD, __( 'Add in RedirHub', 'redirhub-redirects' ), true ) . self::action_button( 'sync', __( 'Update now', 'redirhub-redirects' ), 'refresh-cw' )
+				self::link_button( Settings::dashboard(), __( 'Add in RedirHub', 'redirhub-redirects' ), true ) . self::action_button( 'sync', __( 'Update now', 'redirhub-redirects' ), 'refresh-cw' )
 			);
 		} else {
 			self::row(
@@ -305,7 +413,7 @@ final class View {
 			}
 			self::row( 'check', 'shield-check', esc_html__( 'Domain verified', 'redirhub-redirects' ), sprintf( /* translators: %s: hostnames and when they were checked. */ __( 'Checked by RedirHub: %s. It keeps checking that this site runs your latest redirects.', 'redirhub-redirects' ), implode( ', ', $hosts ) ), self::badge( 'success', __( 'Verified', 'redirhub-redirects' ) ) );
 		} else {
-			self::row( 'check', 'shield-check', esc_html__( 'Verify your domain', 'redirhub-redirects' ), __( 'One last step: press “Check now” on your domain in RedirHub. As soon as it reaches this site, your domain is verified.', 'redirhub-redirects' ), self::badge( 'warning', __( 'Waiting', 'redirhub-redirects' ) ) . self::link_button( Page::DASHBOARD, __( 'Open RedirHub', 'redirhub-redirects' ), true ) );
+			self::row( 'check', 'shield-check', esc_html__( 'Verify your domain', 'redirhub-redirects' ), __( 'One last step: press “Check now” on your domain in RedirHub. As soon as it reaches this site, your domain is verified.', 'redirhub-redirects' ), self::badge( 'warning', __( 'Waiting', 'redirhub-redirects' ) ) . self::link_button( Settings::dashboard(), __( 'Open RedirHub', 'redirhub-redirects' ), true ) );
 		}
 
 		// Click tracking.
@@ -469,7 +577,7 @@ final class View {
 						printf(
 							/* translators: %s: link to RedirHub. */
 							esc_html__( 'To add or change one, use %s: it is live here within a minute.', 'redirhub-redirects' ),
-							'<a class="rh:font-medium rh:text-primary-hover rh:hover:underline" href="' . esc_url( Page::DASHBOARD ) . '" target="_blank" rel="noopener">RedirHub</a>'
+							'<a class="rh:font-medium rh:text-primary-hover rh:hover:underline" href="' . esc_url( Settings::dashboard() ) . '" target="_blank" rel="noopener">RedirHub</a>'
 						);
 						?>
 					</p>

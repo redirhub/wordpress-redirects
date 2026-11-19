@@ -10,6 +10,8 @@ namespace RedirHub\Redirects\Admin;
 defined( 'ABSPATH' ) || exit;
 
 use RedirHub\Redirects\Core\Path;
+use RedirHub\Redirects\Import\Converter;
+use RedirHub\Redirects\Import\Sources;
 use RedirHub\Redirects\Plugin;
 use RedirHub\Redirects\Reporter;
 use RedirHub\Redirects\Settings;
@@ -29,14 +31,11 @@ final class Page {
 	/** Rules per page of the table. */
 	const PER_PAGE = 50;
 
-	/** Where the site owner manages the rules. */
-	const DASHBOARD = 'https://app.redirhub.com';
-
 	/** Hooks the page in. */
 	public static function boot(): void {
 		add_action( 'admin_menu', array( self::class, 'menu' ) );
 		add_action( 'admin_enqueue_scripts', array( self::class, 'assets' ) );
-		foreach ( array( 'connect', 'sync', 'settings', 'disconnect', 'test' ) as $action ) {
+		foreach ( array( 'connect', 'sync', 'settings', 'disconnect', 'test', 'export' ) as $action ) {
 			add_action( 'admin_post_redirhub_' . $action, array( self::class, 'handle_' . $action ) );
 		}
 		add_filter( 'plugin_action_links_' . plugin_basename( REDIRHUB_REDIRECTS_FILE ), array( self::class, 'action_links' ) );
@@ -71,6 +70,10 @@ final class Page {
 			array(
 				'confirmDisconnect' => __( 'Disconnect this site from RedirHub? Its redirects stop at once, until you connect it again.', 'redirhub-redirects' ),
 				'copied'            => __( 'Copied', 'redirhub-redirects' ),
+				'handoffOpening'    => __( 'Opening RedirHub… Sign in there if it asks; your redirects follow.', 'redirhub-redirects' ),
+				'handoffSent'       => __( 'Sent to RedirHub. Check them there and press Import: they only change once you do.', 'redirhub-redirects' ),
+				'handoffBlocked'    => __( 'Your browser blocked the new tab. Allow pop-ups for this page, or download the CSV and upload it under Links → Import in RedirHub.', 'redirhub-redirects' ),
+				'handoffFailed'     => __( 'The redirects couldn’t be read. Download the CSV and upload it under Links → Import in RedirHub.', 'redirhub-redirects' ),
 			)
 		);
 	}
@@ -217,6 +220,31 @@ final class Page {
 	public static function handle_test(): void {
 		self::verify( 'test' );
 		self::back( array(), array( 'test' => SelfTest::run() ) );
+	}
+
+	/**
+	 * The redirects of other plugins as RedirHub's import file: downloaded, or read by the page's
+	 * script, which hands it to the dashboard's import (`?handoff=wordpress`).
+	 */
+	public static function handle_export(): void {
+		self::verify( 'export' );
+		$rows = array();
+		foreach ( Sources::found() as $plugin ) {
+			$rows = array_merge( $rows, $plugin['rows'] );
+		}
+		if ( array() === $rows ) {
+			self::back( array( array( 'warning', __( 'No redirects of other plugins can move: there are none left, or none RedirHub can serve.', 'redirhub-redirects' ) ) ) );
+		}
+		nocache_headers();
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="' . self::export_name() . '"' );
+		echo Converter::csv( $rows ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- a CSV download, not HTML.
+		exit;
+	}
+
+	/** The import file's name: the site and the day. */
+	public static function export_name(): string {
+		return sanitize_file_name( 'redirects-' . wp_parse_url( home_url(), PHP_URL_HOST ) . '-' . gmdate( 'Y-m-d' ) . '.csv' );
 	}
 
 	/**

@@ -10,7 +10,7 @@ const names = [
   'refresh-cw', 'shield-check', 'mouse-pointer-click', 'globe', 'search', 'settings', 'link-2', 'zap',
   'play', 'list', 'layout-dashboard', 'lock', 'shuffle', 'bot', 'message-circle', 'corner-down-right',
   'chevron-right', 'unplug', 'clock', 'key-round', 'plug', 'monitor', 'chart-column', 'gauge', 'copy',
-  'external-link', 'server', 'route',
+  'external-link', 'server', 'route', 'import', 'download', 'package',
 ];
 const icons = {};
 for (const name of names) {

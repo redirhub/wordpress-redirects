@@ -4,3 +4,4 @@
 /e2e/screenshots/
 .phpunit.result.cache
 *.zip
+e2e/.cache/

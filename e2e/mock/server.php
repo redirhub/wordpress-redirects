@@ -74,6 +74,18 @@ if ( '/_edge/hits' === $path && 'POST' === $method ) {
 	exit;
 }
 
+// A stand-in for the dashboard's import (`/links/import?handoff=wordpress`): it tells its
+// opener it is ready, like the real one, and shows what it was handed.
+if ( 'GET /links/import' === $method . ' ' . $path ) {
+	header( 'Content-Type: text/html; charset=utf-8' );
+	echo '<!doctype html><title>Import links</title><pre id="received">waiting</pre><script>'
+		. 'window.addEventListener("message", function (e) { if (e.source !== window.opener || !e.data || e.data.type !== "redirhub:import-file") return;'
+		. ' window.handoff = e.data; document.getElementById("received").textContent = JSON.stringify(e.data); });'
+		. 'if (window.opener) window.opener.postMessage({ type: "redirhub:import-ready" }, "*");'
+		. '</script>';
+	exit;
+}
+
 switch ( $method . ' ' . $path ) {
 	case 'POST /control/rules':
 		file_put_contents( $state . '/rules-' . $name . '.txt', file_get_contents( 'php://input' ) );

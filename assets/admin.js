@@ -63,4 +63,57 @@
 			}
 		});
 	});
+
+	// Redirects of other plugins: open the dashboard's import in a new tab and, once it says it is
+	// ready (it may ask to sign in first), hand it the import file. Only that tab, on the
+	// dashboard's own origin, gets it. A blocked tab leaves the download.
+	app.querySelectorAll('[data-handoff]').forEach(function (form) {
+		var start = form.querySelector('[data-handoff-start]');
+		var status = form.querySelector('[data-handoff-status]');
+		var url = form.getAttribute('data-handoff');
+		var origin = new URL(url, window.location.href).origin;
+		var tab = null;
+		var file = null;
+		var say = function (text) {
+			if (status && text) {
+				status.textContent = text;
+			}
+		};
+		var deliver = function (event) {
+			if (!tab || event.source !== tab || event.origin !== origin || !event.data || event.data.type !== 'redirhub:import-ready') {
+				return;
+			}
+			file.then(function (csv) {
+				tab.postMessage({
+					type: 'redirhub:import-file',
+					name: form.getAttribute('data-handoff-name'),
+					from: form.getAttribute('data-handoff-from'),
+					site: window.location.host,
+					csv: csv
+				}, origin);
+				say(strings.handoffSent);
+			}).catch(function () {
+				say(strings.handoffFailed);
+			});
+		};
+		window.addEventListener('message', deliver);
+		start.addEventListener('click', function () {
+			tab = window.open(url, '_blank');
+			if (!tab) {
+				say(strings.handoffBlocked);
+				return;
+			}
+			say(strings.handoffOpening);
+			file = window.fetch(form.getAttribute('action'), { method: 'POST', body: new FormData(form), credentials: 'same-origin' }).then(function (response) {
+				var type = response.headers.get('Content-Type') || '';
+				if (!response.ok || type.indexOf('text/csv') !== 0) {
+					throw new Error('no file');
+				}
+				return response.text();
+			});
+			file.catch(function () {
+				say(strings.handoffFailed);
+			});
+		});
+	});
 })();

@@ -23,6 +23,10 @@ final class Settings {
 	const RULES_URL_CONSTANT = 'REDIRHUB_RULES_URL';
 	const KEY_CONSTANT       = 'REDIRHUB_INTEGRATION_KEY';
 
+	/** Where the site owner manages the redirects; a constant of that name points elsewhere (a test dashboard). */
+	const DASHBOARD          = 'https://app.redirhub.com';
+	const DASHBOARD_CONSTANT = 'REDIRHUB_DASHBOARD_URL';
+
 	/** Where the visitor's address comes from: never a header a visitor can send, unless the site owner says a proxy overwrites it. */
 	const IP_SOURCES = array( 'remote_addr', 'cloudflare', 'x_real_ip', 'custom' );
 
@@ -79,6 +83,13 @@ final class Settings {
 		}
 
 		return trim( (string) self::all()['key'] );
+	}
+
+	/** The dashboard's address, without a trailing slash. */
+	public static function dashboard(): string {
+		$url = defined( self::DASHBOARD_CONSTANT ) ? (string) constant( self::DASHBOARD_CONSTANT ) : self::DASHBOARD;
+
+		return rtrim( '' === $url ? self::DASHBOARD : $url, '/' );
 	}
 
 	/** Whether the rules address comes from wp-config.php. */
