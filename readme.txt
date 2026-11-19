@@ -8,32 +8,34 @@ Stable tag: 1.0.0
 License: Apache-2.0
 License URI: https://www.apache.org/licenses/LICENSE-2.0
 
-Send every old, moved or mistyped link to the right page. Keep your search rankings, run short links on your own domain, see every click.
+Redirects and short links for all your sites in one place: keep your rankings when URLs change and see who clicks every link.
 
 == Description ==
 
 Pages move. Products get renamed. Sites change domain. Links get printed on flyers and shared in chats, and keep being clicked for years. Every one of those clicks should land somewhere useful, not on a "page not found".
 
-RedirHub Redirects makes sure they do, without touching your server, your hosting or your DNS.
+RedirHub Redirects makes sure they do, and shows you who still uses them, without touching your server, your hosting or your DNS.
 
 = What you get =
 
-* **Keep your search rankings when URLs change.** Permanent redirects tell Google where a page went, so its ranking moves with it. Moving a whole site? Map thousands of old URLs to new ones at once.
+* **Every site in one place.** Manage the redirects of all your sites, WordPress or not, from one dashboard, with your team. No more logging in to ten admin areas to fix one link.
+* **See who clicks your old links.** Every redirect is counted: how visitors arrived (search, social, email, QR scans, other sites), their country and city, device and browser, with bots filtered out. Compare with the previous period, watch visits live, get a weekly summary by email. And see the "not found" pages people still open, so you know which redirect is missing.
+* **Your WordPress database stays light.** Visits and logs are kept in RedirHub, not in your site's database, which only holds the redirects themselves.
+* **Redirects that outlive your site.** Change theme, host or platform: your redirects stay in RedirHub and keep working wherever the domain goes next.
+* **Keep your search rankings when URLs change.** Permanent redirects tell Google where a page went, so its ranking moves with it. Moving a whole site? Map thousands of old URLs at once, from a spreadsheet, a Google Sheet, the API or your AI assistant.
 * **No more dead ends.** Send every page your site cannot find to a page of your choice. Pages that work are never touched.
-* **See what your links do.** Clicks per link, where visitors came from, their country and browser. Plus the "not found" pages people still try to open, so you know exactly which redirect is missing.
-* **Short links on your own domain.** `yoursite.com/spring` for a campaign, a QR code or a flyer. Change where it goes at any time, without reprinting anything.
+* **Short links and QR codes on your own domain.** `yoursite.com/spring` for a campaign, a QR code or a flyer. Change where it goes at any time, without reprinting anything.
 * **Links that do more.** Protect a link with a password, split visitors between several destinations, keep bots away from a link, or help WeChat users open it in their browser.
 * **Bring your redirects with you.** Already use Redirection, Rank Math, Yoast SEO Premium, All in One SEO, SEOPress, Safe Redirect Manager, Simple 301 Redirects or 301 Redirects? The plugin finds their redirects and sends them to RedirHub in one click, where you check them before anything changes.
-* **Fast.** Redirects are answered before your theme loads: about 6 ms, even with 50,000 of them, against 40 ms or more for a normal page.
-* **Safe.** Only the addresses you set up are redirected. If anything goes wrong, your site behaves as if the plugin were not there, and your redirects keep working with the last good copy.
-* **Works with your cache.** When a redirect changes, the plugin clears the affected pages in WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, Cache Enabler, SiteGround Optimizer and more, so an old cached page never gets in the way.
+* **Fast and safe.** Redirects are answered before your theme loads: about 6 ms, even with 50,000 of them. Only the addresses you set up are redirected; if anything goes wrong, your site behaves as if the plugin were not there.
+* **Works with your cache.** When a redirect changes, the plugin clears the affected pages in WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, Cache Enabler, SiteGround Optimizer and more.
 * **You always know it works.** One click tests your redirects from the outside, the way a visitor reaches them, through any cache or CDN. Problems show up on the plugin's page, as an admin notice and in Site Health.
 
 = How it works =
 
 You manage your redirects in the RedirHub dashboard: one by one, from a spreadsheet, by API, or by asking an AI assistant. This plugin keeps your site in sync within a minute and answers them itself. Your domain stays exactly where it is.
 
-You need a [RedirHub](https://www.redirhub.com) account.
+You need a [RedirHub](https://www.redirhub.com) account. RedirHub is a paid service: Core starts right away, and Pro comes with a 14-day free trial. See the [plans and prices](https://www.redirhub.com/pricing).
 
 = External service =
 

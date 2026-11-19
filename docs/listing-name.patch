@@ -1,5 +1,5 @@
 diff --git a/readme.txt b/readme.txt
-index b2029c5..615e728 100644
+index b117031..84b08f0 100644
 --- a/readme.txt
 +++ b/readme.txt
 @@ -1,4 +1,4 @@
@@ -9,7 +9,7 @@ index b2029c5..615e728 100644
  Tags: redirect, 301 redirect, 404, url shortener, link tracking
  Requires at least: 5.9
 diff --git a/redirhub-redirects.php b/redirhub-redirects.php
-index 26ded01..e462ca9 100644
+index 631c918..1996c77 100644
 --- a/redirhub-redirects.php
 +++ b/redirhub-redirects.php
 @@ -1,6 +1,6 @@
@@ -18,5 +18,5 @@ index 26ded01..e462ca9 100644
 - * Plugin Name:       RedirHub Redirects
 + * Plugin Name:       RedirHub – 301 Redirects, 404 Fixes & Short Links
   * Plugin URI:        https://github.com/redirhub/wordpress-redirects
-  * Description:       Send every old, moved or mistyped link to the right page: keep your search rankings, run short links on your own domain and see every click. No server or DNS changes.
+  * Description:       Redirects and short links for all your sites in one place: keep your search rankings when URLs change and see who clicks every link. No server or DNS changes.
   * Version:           1.0.0

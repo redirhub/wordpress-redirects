@@ -244,10 +244,10 @@ final class View {
 	 */
 	private static function onboarding( string $rules_url ): void {
 		$benefits = array(
+			array( 'layout-dashboard', __( 'Every site in one place', 'redirhub-redirects' ), __( 'Manage the redirects and short links of all your sites, WordPress or not, from one dashboard, with your team.', 'redirhub-redirects' ) ),
+			array( 'chart-column', __( 'See who clicks your old links', 'redirhub-redirects' ), __( 'Clicks per link, how visitors arrived, their country and device, bots left out, and the missing pages people still open. Kept in RedirHub, not in your database.', 'redirhub-redirects' ) ),
 			array( 'route', __( 'Keep your rankings when URLs change', 'redirhub-redirects' ), __( 'Permanent redirects carry an old page’s search ranking to its new address, one page or a whole site at a time.', 'redirhub-redirects' ) ),
-			array( 'link-2', __( 'Short links on your own domain', 'redirhub-redirects' ), __( 'yoursite.com/spring for a flyer or a QR code. Change where it goes at any time, without reprinting.', 'redirhub-redirects' ) ),
-			array( 'chart-column', __( 'See every click', 'redirhub-redirects' ), __( 'Clicks per link, where visitors come from, and the missing pages people still try to open.', 'redirhub-redirects' ) ),
-			array( 'shield-check', __( 'Nothing to change on your server', 'redirhub-redirects' ), __( 'Your domain and DNS stay where they are. Redirects answer in a few milliseconds.', 'redirhub-redirects' ) ),
+			array( 'link-2', __( 'Short links and QR codes on your domain', 'redirhub-redirects' ), __( 'yoursite.com/spring for a flyer or a QR code. Change where it goes at any time, without reprinting.', 'redirhub-redirects' ) ),
 		);
 		$steps    = array(
 			sprintf(
