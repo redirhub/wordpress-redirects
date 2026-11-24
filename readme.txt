@@ -43,6 +43,7 @@ This plugin connects your site to RedirHub, a service run by RedirHub:
 
 * It downloads your domain's rules file from the rules address you paste (about once a minute; RedirHub's server sees your server's IP address and the plugin's name and version).
 * With the integration key, it reports each redirect (and, where your domain asks for it, each "not found" page) to RedirHub's analytics: the visitor's IP address, the time, the address requested, the status, the referrer and the browser's User-Agent. No cookies or other data are sent. You can switch reports off under Tools → RedirHub.
+* Only when you press "Import into RedirHub": your browser opens the RedirHub dashboard (dash.redirhub.com) and hands it the list of redirects found in your other redirect plugins (the old address, the target, the type and the plugin's name), for you to review there. Nothing is sent otherwise.
 * RedirHub calls your site's check path (`/_redirhub/check`) to confirm the domain is yours and serves its latest rules.
 
 RedirHub's [terms of service](https://www.redirhub.com/legal/terms-of-service) and [privacy policy](https://www.redirhub.com/legal/privacy-policy) apply.
