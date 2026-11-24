@@ -9,6 +9,7 @@ bin
 build
 composer.json
 composer.lock
+docs
 e2e
 node_modules
 phpunit.xml.dist
